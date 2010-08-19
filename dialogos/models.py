@@ -9,7 +9,6 @@ from django.utils.translation import ugettext_lazy as _
 
 
 COMMENT_MAX_LENGTH = getattr(settings,'DIALOGOS_COMMENT_MAX_LENGTH', 3000)
-COMMENT_FLAG_REASONS = getattr(settings, "DIALOGOS_COMMENT_FLAG_REASONS", [(1, "inappropriate")])
 
 
 class Comment(models.Model):
@@ -30,12 +29,3 @@ class Comment(models.Model):
     is_public = models.BooleanField(_("is public"), default=True)
     is_removed = models.BooleanField(_("is removed"), default=False)
 
-
-class CommentFlag(models.Model):
-    
-    user = models.ForeignKey(User, related_name="comment_flags")
-    comment = models.ForeignKey(Comment, related_name="flags")
-    flag = models.CharField(_("flag"), max_length=30, db_index=True)
-    reason = models.IntegerField(_("reason"), choices=COMMENT_FLAG_REASONS)
-    flag_date = models.DateTimeField(_("date"), default=datetime.now)
-    

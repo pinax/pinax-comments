@@ -4,11 +4,8 @@
 Getting started
 ===============
 
-This document is designed to get you up and running with dialogos. This app is
-designed for use with Django_, however, can be used with Pinax_. Pinax can
-provide some extra components which will enhance the functionality of dialogos.
-Those extra components are designed for Django too and Pinax simply brings
-them together.
+This document is designed to get you up and running with dialogos, which is a
+comments app that works with ``django-flag`` to provide flagging capabilities.
 
 
 Prerequisites
@@ -27,7 +24,7 @@ To install dialogos use pip_:
 
 .. code-block:: none
 
-    pip install dialogos
+    pip install dialogos flag
 
 Add dialogos to your ``INSTALLED_APPS``:
 
@@ -35,6 +32,7 @@ Add dialogos to your ``INSTALLED_APPS``:
 
     INSTALLED_APPS = [
         # ...
+        "flag",
         "dialogos",
     ]
 

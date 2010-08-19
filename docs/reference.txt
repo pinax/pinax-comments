@@ -10,13 +10,6 @@ This document covers various components of dialogos.
 Settings
 ========
 
-``DIALOGOS_COMMENT_FLAG_REASONS``
----------------------------------
-
-A tuple list of reasons for flagging a comment.
-
-:default: ``[(1, "inappropriate")]``
-
 
 ``DIALOGOS_COMMENT_MAX_LENGTH``
 -------------------------------
