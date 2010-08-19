@@ -1,0 +1,25 @@
+.. _ref-reference:
+
+=========
+Reference
+=========
+
+This document covers various components of dialogos.
+
+
+Settings
+========
+
+``COMMENT_FLAG_REASONS``
+------------------------
+
+A tuple list of reasons for flagging a comment.
+
+
+Modules
+=======
+
+
+``dialogos.urls``
+-----------------
+
