@@ -10,10 +10,40 @@ This document covers various components of dialogos.
 Settings
 ========
 
-``COMMENT_FLAG_REASONS``
-------------------------
+``DIALOGOS_COMMENT_FLAG_REASONS``
+---------------------------------
 
 A tuple list of reasons for flagging a comment.
+
+:default: ``[(1, "inappropriate")]``
+
+
+``DIALOGOS_COMMENT_MAX_LENGTH``
+-------------------------------
+
+An integer that is the max length of allowed comments.  This controls both the
+validation in the form as well as ``max_length`` of the ``Comment.comment``
+field.
+
+:default: ``3000``
+
+
+``DIALOGOS_PROFANITIES_LIST``
+-----------------------------
+
+A list of words to disallow if ``DIALOGOS_ALLOW_PROFANITIES`` is set to
+``False``.
+
+:default: ``[]``
+
+
+``DIALOGOS_ALLOW_PROFANITIES``
+------------------------------
+
+If set to ``False``, check words against the ``DIALOGOS_PROFANITIES_LIST`` as
+part of the the validation in the ``forms.CommentForm``.
+
+:default: ``True``
 
 
 Modules
