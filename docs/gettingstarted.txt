@@ -52,6 +52,54 @@ Continue reading on to learn more about how to use dialogos.
 Usage
 =====
 
+To use comments, you basically just need to make appropriate use of template
+tags in your templates.
+
+First, you need to load the template tags::
+
+    {% load dialogos_tags %}
+
+Like Django's built in comments, ``dialogos`` comments are attached to an object
+in your project.
+
+
+``get_comment_count``
+---------------------
+
+Gets the comment count for a particular object::
+
+    {% get_comment_count for post as comment_count %}
+
+
+``get_comment_list``
+--------------------
+
+Gets the list of comments for particular object::
+
+    {% get_comment_list for post as comment_list %}
+    <ul>
+    {% for comment in comment_list %}
+        {{ comment.comment }} by {{ comment.author|default:comment.name }}
+    {% endfor %}
+    </ul>
+
+
+``get_comment_form``
+--------------------
+
+Gets the comment form for a particular object::
+
+    {% get_comment_form for post as form %}
+    
+    <form action="{% url dialogos_form_target %}" method="POST">
+      {% csrf_token %}
+      {{ form }}
+      <tr>
+        <td></td>
+        <td><input type="submit" name="preview" class="submit-post" value="Preview"></td>
+      </tr>
+    </form>
+
 
 
 .. _Django: http://www.djangoproject.com/
