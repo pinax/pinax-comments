@@ -8,6 +8,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 
 
+COMMENT_MAX_LENGTH = getattr(settings,'DIALOGOS_COMMENT_MAX_LENGTH', 3000)
+COMMENT_FLAG_REASONS = getattr(settings, "DIALOGOS_COMMENT_FLAG_REASONS", [(1, "inappropriate")])
+
+
 class Comment(models.Model):
     
     author = models.ForeignKey(User, null=True, blank=True, related_name="comments")
@@ -19,7 +23,7 @@ class Comment(models.Model):
     object_pk = models.TextField(_("object ID"))
     content_object = generic.GenericForeignKey(ct_field="content_type", fk_field="object_pk")
     
-    comment = models.TextField(_("comment"))
+    comment = models.TextField(_("comment"), max_length=COMMENT_MAX_LENGTH)
     
     submit_date = models.DateTimeField(_("date/time submitted"), default=datetime.now)
     ip_address = models.IPAddressField(_("IP address"), blank=True, null=True)
@@ -32,6 +36,6 @@ class CommentFlag(models.Model):
     user = models.ForeignKey(User, related_name="comment_flags")
     comment = models.ForeignKey(Comment, related_name="flags")
     flag = models.CharField(_("flag"), max_length=30, db_index=True)
-    reason = models.IntegerField(_("reason"), choices=settings.COMMENT_FLAG_REASONS)
+    reason = models.IntegerField(_("reason"), choices=COMMENT_FLAG_REASONS)
     flag_date = models.DateTimeField(_("date"), default=datetime.now)
     
