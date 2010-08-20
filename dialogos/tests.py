@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.template import Template, Context
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -11,6 +12,11 @@ from dialogos.models import Comment
 class CommentTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user("gimli", "myaxe@dwarf.org", "gloin")
+
+    def assert_renders(self, tmpl, context, value):
+        tmpl = Template(tmpl)
+        self.assertEqual(tmpl.render(Context(context)), value)
+    
     
     def post_comment(self, obj, data):
         return self.post("post_comment",
@@ -43,3 +49,20 @@ class CommentTests(TestCase):
             c = Comment.objects.order_by("id")[1]
             self.assertEqual(c.comment, "I thought you were watching the hobbits?")
             self.assertEqual(c.author, self.user)
+    
+    def test_templatetags(self):
+        g = User.objects.create(username="Sauron")
+        self.post_comment(g, data={
+            "name": "Gandalf",
+            "comment": "You can't win",
+        })
+        self.post_comment(g, data={
+            "name": "Gollum",
+            "comment": "We wants our precious",
+        })
+        
+        self.assert_renders(
+            "{% load dialogos_tags %}{% get_comment_count o %}", 
+            {"o": g},
+            "2"
+        )
