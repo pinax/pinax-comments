@@ -1,4 +1,5 @@
 from django import template
+from django.core.urlresolvers import reverse
 
 from django.contrib.contenttypes.models import ContentType
 
@@ -69,6 +70,17 @@ class CommentFormNode(BaseCommentNode):
         return ""
 
 
+class CommentTargetNode(BaseCommentNode):
+    requires_as_var = False
+    
+    def render(self, context):
+        obj = self.obj.resolve(context)
+        return reverse("post_comment", kwargs={
+            "content_type_id": ContentType.objects.get_for_model(obj).pk,
+            "object_id": obj.pk
+        })
+
+
 @register.tag
 def comment_count(parser, token):
     """
@@ -100,3 +112,12 @@ def comment_form(parser, token):
     form an auth'd user or not.
     """
     return CommentFormNode.handle_token(parser, token)
+
+@register.tag
+def comment_target(parser, token):
+    """
+    Usage:
+        
+        {% comment_target obj [as varname] %}
+    """
+    return CommentTargetNode.handle_token(parser, token)

@@ -111,3 +111,11 @@ class CommentTests(TestCase):
                 ""
             )
             self.assertTrue(isinstance(c["comment_form"], AuthenticatedCommentForm))
+    
+    def test_ttag_comment_target(self):
+        g = User.objects.create(username="legolas")
+        self.assert_renders(
+            "{% load dialogos_tags %}{% comment_target o %}",
+            Context({"o": g}),
+            "/comment/%d/%d/" % (ContentType.objects.get_for_model(g).pk, g.pk)
+        )
