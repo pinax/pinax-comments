@@ -13,7 +13,6 @@ setup(
     packages = [
         "dialogos",
         "dialogos.templatetags",
-        "dialogos.tests",
     ],
     classifiers = [
         "Development Status :: 3 - Alpha",
