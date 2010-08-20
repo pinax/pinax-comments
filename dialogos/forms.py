@@ -7,7 +7,7 @@ from dialogos.models import Comment
 
 class BaseCommentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop("request")
+        self.request = kwargs.pop("request", None)
         self.obj = kwargs.pop("obj")
         super(BaseCommentForm, self).__init__(*args, **kwargs)
     

@@ -2,6 +2,7 @@ from django import template
 
 from django.contrib.contenttypes.models import ContentType
 
+from dialogos.forms import UnauthenticatedCommentForm, AuthenticatedCommentForm
 from dialogos.models import Comment
 
 
@@ -54,6 +55,20 @@ class CommentsNode(BaseCommentNode):
         return ""
 
 
+class CommentFormNode(BaseCommentNode):
+    requires_as_var = False
+    
+    def render(self, context):
+        obj = self.obj.resolve(context)
+        user = context.get("user")
+        if user is None or not user.is_authenticated():
+            form = UnauthenticatedCommentForm(obj=obj)
+        else:
+            form = AuthenticatedCommentForm(obj=obj)
+        context[self.varname] = form
+        return ""
+
+
 @register.tag
 def comment_count(parser, token):
     """
@@ -73,3 +88,15 @@ def comments(parser, token):
         {% comments obj as var %}
     """
     return CommentsNode.handle_token(parser, token)
+
+@register.tag
+def comment_form(parser, token):
+    """
+    Usage:
+        
+        {% comment_form obj as comment_form %}
+        
+    Will read the `user` var out of the contex to know if the form should be
+    form an auth'd user or not.
+    """
+    return CommentFormNode.handle_token(parser, token)

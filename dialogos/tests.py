@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from eldarion.test import TestCase
 
+from dialogos.forms import UnauthenticatedCommentForm, AuthenticatedCommentForm
 from dialogos.models import Comment
 
 
@@ -91,3 +92,22 @@ class CommentTests(TestCase):
             ""
         )
         self.assertEqual(list(c["cs"]), list(Comment.objects.all()))
+    
+    def test_ttag_comment_form(self):
+        g = User.objects.create(username="Sauron")
+        c = Context({"o": g})
+        self.assert_renders(
+            "{% load dialogos_tags %}{% comment_form o as comment_form %}",
+            c,
+            ""
+        )
+        self.assertTrue(isinstance(c["comment_form"], UnauthenticatedCommentForm))
+        
+        with self.login("gimli", "gloin"):
+            c = Context({"o": g, "user": self.user})
+            self.assert_renders(
+                "{% load dialogos_tags %}{% comment_form o as comment_form %}",
+                c,
+                ""
+            )
+            self.assertTrue(isinstance(c["comment_form"], AuthenticatedCommentForm))
