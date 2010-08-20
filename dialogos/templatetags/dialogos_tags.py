@@ -55,21 +55,21 @@ class CommentsNode(BaseCommentNode):
 
 
 @register.tag
-def get_comment_count(parser, token):
+def comment_count(parser, token):
     """
     Usage:
         
-        {% get_comment_count obj %}
+        {% comment_count obj %}
     or
-        {% get_comment_count obj as var %}
+        {% comment_count obj as var %}
     """
     return CommentCountNode.handle_token(parser, token)
 
 @register.tag
-def get_comments(parser, token):
+def comments(parser, token):
     """
     Usage:
         
-        {% get_comments obj as var %}
+        {% comments obj as var %}
     """
     return CommentsNode.handle_token(parser, token)
