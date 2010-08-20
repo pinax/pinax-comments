@@ -9,7 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 class Comment(models.Model):
     author = models.ForeignKey(User, null=True, related_name="comments")
     
-    name = models.CharField(max_length=100, blank=True)
+    name = models.CharField(max_length=100)
     email = models.CharField(max_length=255, blank=True)
     website = models.CharField(max_length=255, blank=True)
     

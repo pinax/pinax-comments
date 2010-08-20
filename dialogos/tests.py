@@ -39,6 +39,12 @@ class CommentTests(TestCase):
         self.assertEqual(c.author, None)
         self.assertEqual(c.name, "Frodo Baggins")
         
+        response = self.post_comment(g, data={
+            "comment": "Where is everyone?"
+        })
+        self.assertEqual(Comment.objects.count(), 1)
+        
+        
         with self.login("gimli", "gloin"):
             response = self.post_comment(g, data={
                 "comment": "I thought you were watching the hobbits?"

@@ -15,7 +15,6 @@ def post_comment(request, content_type_id, object_id):
     else:
         form_class = UnauthenticatedCommentForm
     form = form_class(request.POST, request=request, obj=obj)
-    if not form.is_valid():
-        raise NotImplementedError
-    form.save()
+    if form.is_valid():
+        form.save()
     return redirect(obj)
