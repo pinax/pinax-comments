@@ -15,7 +15,7 @@ class CommentTests(TestCase):
 
     def assert_renders(self, tmpl, context, value):
         tmpl = Template(tmpl)
-        self.assertEqual(tmpl.render(Context(context)), value)
+        self.assertEqual(tmpl.render(context), value)
     
     
     def post_comment(self, obj, data):
@@ -50,7 +50,7 @@ class CommentTests(TestCase):
             self.assertEqual(c.comment, "I thought you were watching the hobbits?")
             self.assertEqual(c.author, self.user)
     
-    def test_templatetags(self):
+    def test_ttag_get_comment_count(self):
         g = User.objects.create(username="Sauron")
         self.post_comment(g, data={
             "name": "Gandalf",
@@ -63,6 +63,25 @@ class CommentTests(TestCase):
         
         self.assert_renders(
             "{% load dialogos_tags %}{% get_comment_count o %}", 
-            {"o": g},
+            Context({"o": g}),
             "2"
         )
+    
+    def test_ttag_get_comments(self):
+        g = User.objects.create(username="Sauron")
+        self.post_comment(g, data={
+            "name": "Gandalf",
+            "comment": "You can't win",
+        })
+        self.post_comment(g, data={
+            "name": "Gollum",
+            "comment": "We wants our precious",
+        })
+        
+        c = Context({"o": g})
+        self.assert_renders(
+            "{% load dialogos_tags %}{% get_comments o as cs %}",
+            c,
+            ""
+        )
+        self.assertEqual(list(c["cs"]), list(Comment.objects.all()))

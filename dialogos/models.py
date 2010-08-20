@@ -21,3 +21,6 @@ class Comment(models.Model):
     submit_date = models.DateTimeField(default=datetime.now)
     ip_address = models.IPAddressField(null=True)
     public = models.BooleanField(default=True)
+    
+    def __unicode__(self):
+        return "pk=%d" % self.pk
