@@ -10,8 +10,9 @@ if not settings.configured:
         DATABASE_ENGINE="sqlite3",
         ROOT_URLCONF="dialogos.urls",
         INSTALLED_APPS=[
-            "django.contrib.contenttypes",
             "django.contrib.auth",
+            "django.contrib.contenttypes",
+            "django.contrib.sessions",
             "dialogos",
         ]
     )

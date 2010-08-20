@@ -28,3 +28,18 @@ class UnauthenticatedCommentForm(BaseCommentForm):
         fields = [
             "name", "email", "website", "comment"
         ]
+
+
+class AuthenticatedCommentForm(BaseCommentForm):
+    class Meta:
+        model = Comment
+        fields = [
+            "comment"
+        ]
+    
+    def save(self, commit=True):
+        comment = super(AuthenticatedCommentForm, self).save(commit=False)
+        comment.author = self.request.user
+        if commit:
+            comment.save()
+        return comment
