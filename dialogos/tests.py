@@ -13,6 +13,7 @@ from dialogos.models import Comment
 class CommentTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user("gimli", "myaxe@dwarf.org", "gloin")
+        self.user2 = User.objects.create_user("aragorn", "theking@gondor.gov", "strider")
 
     def assert_renders(self, tmpl, context, value):
         tmpl = Template(tmpl)
@@ -56,6 +57,28 @@ class CommentTests(TestCase):
             c = Comment.objects.order_by("id")[1]
             self.assertEqual(c.comment, "I thought you were watching the hobbits?")
             self.assertEqual(c.author, self.user)
+    
+    def test_delete_comment(self):
+        g = User.objects.create(username="Boromir")
+        with self.login("gimli", "gloin"):
+            response = self.post_comment(g, data={
+                "comment": "Wow, you're a jerk.",
+            })
+            comment = Comment.objects.get()
+        
+        response = self.post("delete_comment", comment_id=comment.pk)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Comment.objects.count(), 1)
+        
+        with self.login("aragorn", "strider"):
+            response = self.post("delete_comment", comment_id=comment.pk)
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(Comment.objects.count(), 1)
+        
+        with self.login("gimli", "gloin"):
+            response = self.post("delete_comment", comment_id=comment.pk)
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(Comment.objects.count(), 0)
     
     def test_ttag_comment_count(self):
         g = User.objects.create(username="Sauron")
