@@ -1,5 +1,6 @@
 from django.views.decorators.http import require_POST
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseRedirect
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
@@ -19,7 +20,7 @@ def post_comment(request, content_type_id, object_id):
     form = form_class(request.POST, request=request, obj=obj)
     if form.is_valid():
         form.save()
-    return redirect(obj)
+    return HttpResponseRedirect(obj.get_absolute_url())
 
 @login_required
 @require_POST
@@ -28,4 +29,4 @@ def delete_comment(request, comment_id):
     obj = comment.content_object
     if comment.author == request.user:
         comment.delete()
-    return redirect(obj)
+    return HttpResponseRedirect(obj.get_absolute_url())
