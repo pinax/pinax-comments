@@ -19,7 +19,11 @@ def post_comment(request, content_type_id, object_id):
     form = form_class(request.POST, request=request, obj=obj)
     if form.is_valid():
         form.save()
-    return redirect(obj)
+    redirect_to = request.POST.get("next")
+    # light security check -- make sure redirect_to isn't garbage.
+    if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
+        redirect_to = obj
+    return redirect(redirect_to)
 
 
 @login_required
