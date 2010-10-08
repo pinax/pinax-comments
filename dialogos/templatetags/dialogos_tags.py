@@ -11,6 +11,7 @@ register = template.Library()
 
 
 class BaseCommentNode(template.Node):
+    
     @classmethod
     def handle_token(cls, parser, token):
         bits = token.split_contents()
@@ -25,7 +26,7 @@ class BaseCommentNode(template.Node):
         else:
             args = "either 1 or 3 arguments"
         raise template.TemplateSyntaxError("%r takes %s" % (bits[0], args))
-
+    
     def __init__(self, obj, varname=None):
         self.obj = obj
         self.varname = varname
@@ -37,7 +38,9 @@ class BaseCommentNode(template.Node):
             content_type=ContentType.objects.get_for_model(obj)
         )
 
+
 class CommentCountNode(BaseCommentNode):
+    
     requires_as_var = False
     
     def render(self, context):
@@ -49,6 +52,7 @@ class CommentCountNode(BaseCommentNode):
 
 
 class CommentsNode(BaseCommentNode):
+    
     requires_as_var = True
     
     def render(self, context):
@@ -57,6 +61,7 @@ class CommentsNode(BaseCommentNode):
 
 
 class CommentFormNode(BaseCommentNode):
+    
     requires_as_var = False
     
     def render(self, context):
@@ -71,6 +76,7 @@ class CommentFormNode(BaseCommentNode):
 
 
 class CommentTargetNode(BaseCommentNode):
+    
     requires_as_var = False
     
     def render(self, context):
@@ -92,6 +98,7 @@ def comment_count(parser, token):
     """
     return CommentCountNode.handle_token(parser, token)
 
+
 @register.tag
 def comments(parser, token):
     """
@@ -100,6 +107,7 @@ def comments(parser, token):
         {% comments obj as var %}
     """
     return CommentsNode.handle_token(parser, token)
+
 
 @register.tag
 def comment_form(parser, token):
@@ -112,6 +120,7 @@ def comment_form(parser, token):
     form an auth'd user or not.
     """
     return CommentFormNode.handle_token(parser, token)
+
 
 @register.tag
 def comment_target(parser, token):

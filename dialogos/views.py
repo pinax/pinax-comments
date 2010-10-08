@@ -21,6 +21,7 @@ def post_comment(request, content_type_id, object_id):
         form.save()
     return redirect(obj)
 
+
 @login_required
 @require_POST
 def delete_comment(request, comment_id):

@@ -11,14 +11,14 @@ from dialogos.models import Comment
 
 
 class CommentTests(TestCase):
+    
     def setUp(self):
         self.user = User.objects.create_user("gimli", "myaxe@dwarf.org", "gloin")
         self.user2 = User.objects.create_user("aragorn", "theking@gondor.gov", "strider")
-
+    
     def assert_renders(self, tmpl, context, value):
         tmpl = Template(tmpl)
         self.assertEqual(tmpl.render(context), value)
-    
     
     def post_comment(self, obj, data):
         return self.post("post_comment",
@@ -45,7 +45,6 @@ class CommentTests(TestCase):
             "comment": "Where is everyone?"
         })
         self.assertEqual(Comment.objects.count(), 1)
-        
         
         with self.login("gimli", "gloin"):
             response = self.post_comment(g, data={

@@ -6,6 +6,7 @@ from dialogos.models import Comment
 
 
 class BaseCommentForm(forms.ModelForm):
+    
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request", None)
         self.obj = kwargs.pop("obj")
@@ -21,8 +22,8 @@ class BaseCommentForm(forms.ModelForm):
         return comment
 
 
-
 class UnauthenticatedCommentForm(BaseCommentForm):
+    
     class Meta:
         model = Comment
         fields = [
@@ -31,6 +32,7 @@ class UnauthenticatedCommentForm(BaseCommentForm):
 
 
 class AuthenticatedCommentForm(BaseCommentForm):
+    
     class Meta:
         model = Comment
         fields = [

@@ -8,6 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 
 
 class Comment(models.Model):
+    
     author = models.ForeignKey(User, null=True, related_name="comments")
     
     name = models.CharField(max_length=100)
