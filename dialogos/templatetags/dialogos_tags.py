@@ -33,10 +33,11 @@ class BaseCommentNode(template.Node):
     
     def get_comments(self, context):
         obj = self.obj.resolve(context)
-        return Comment.objects.filter(
+        comments = Comment.objects.filter(
             object_id=obj.pk,
             content_type=ContentType.objects.get_for_model(obj)
         )
+        return comments.order_by("submit_date")
 
 
 class CommentCountNode(BaseCommentNode):
