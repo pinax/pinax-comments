@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 
-from dialogos.forms import UnauthenticatedCommentForm, AuthenticatedCommentForm
+from dialogos.forms import CommentForm
 from dialogos.models import Comment
 
 
@@ -12,11 +12,7 @@ from dialogos.models import Comment
 def post_comment(request, content_type_id, object_id):
     content_type = get_object_or_404(ContentType, pk=content_type_id)
     obj = get_object_or_404(content_type.model_class(), pk=object_id)
-    if request.user.is_authenticated():
-        form_class = AuthenticatedCommentForm
-    else:
-        form_class = UnauthenticatedCommentForm
-    form = form_class(request.POST, request=request, obj=obj)
+    form = CommentForm(request.POST, request=request, obj=obj, user=request.user)
     if form.is_valid():
         form.save()
     redirect_to = request.POST.get("next")

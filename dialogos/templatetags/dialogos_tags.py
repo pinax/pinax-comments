@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 
 from django.contrib.contenttypes.models import ContentType
 
-from dialogos.forms import UnauthenticatedCommentForm, AuthenticatedCommentForm
+from dialogos.forms import CommentForm
 from dialogos.models import Comment
 
 
@@ -68,10 +68,8 @@ class CommentFormNode(BaseCommentNode):
     def render(self, context):
         obj = self.obj.resolve(context)
         user = context.get("user")
-        if user is None or not user.is_authenticated():
-            form = UnauthenticatedCommentForm(obj=obj)
-        else:
-            form = AuthenticatedCommentForm(obj=obj)
+        form_class = context.get("form", CommentForm)
+        form = form_class(obj=obj, user=user)
         context[self.varname] = form
         return ""
 
