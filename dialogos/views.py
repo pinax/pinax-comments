@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from dialogos.forms import CommentForm
 from dialogos.models import Comment
+from dialogos.signals import commented
 
 
 @require_POST
@@ -14,7 +15,8 @@ def post_comment(request, content_type_id, object_id):
     obj = get_object_or_404(content_type.model_class(), pk=object_id)
     form = CommentForm(request.POST, request=request, obj=obj, user=request.user)
     if form.is_valid():
-        form.save()
+        comment = form.save()
+        commented.send(sender=post_comment, comment=comment, request=request)
     redirect_to = request.POST.get("next")
     # light security check -- make sure redirect_to isn't garbage.
     if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
