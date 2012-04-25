@@ -1,3 +1,7 @@
+import json
+
+from django.http import HttpResponse
+
 from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404, redirect
 
@@ -10,13 +14,32 @@ from dialogos.signals import commented
 
 
 @require_POST
-def post_comment(request, content_type_id, object_id):
+def post_comment(request, content_type_id, object_id, form_class=CommentForm):
     content_type = get_object_or_404(ContentType, pk=content_type_id)
     obj = get_object_or_404(content_type.model_class(), pk=object_id)
-    form = CommentForm(request.POST, request=request, obj=obj, user=request.user)
+    form = form_class(request.POST, request=request, obj=obj, user=request.user)
     if form.is_valid():
         comment = form.save()
         commented.send(sender=post_comment, comment=comment, request=request)
+        if request.is_ajax():
+            return HttpResponse(json.dumps({
+                "status": "OK",
+                "comment": {
+                    "pk": comment.pk,
+                    "comment": comment.comment,
+                    "author": comment.author.username,
+                    "name": comment.name,
+                    "email": comment.email,
+                    "website": comment.website,
+                    "submit_date": str(comment.submit_date)
+                }
+            }), mimetype="application/json")
+    else:
+        if request.is_ajax():
+            return HttpResponse(json.dumps({
+                "status": "ERROR",
+                "errors": form.errors
+            }), mimetype="application/json")
     redirect_to = request.POST.get("next")
     # light security check -- make sure redirect_to isn't garbage.
     if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
