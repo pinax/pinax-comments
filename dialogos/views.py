@@ -18,6 +18,18 @@ can_delete = load_can_delete()
 can_edit = load_can_edit()
 
 
+def dehydrate_comment(comment):
+    return {
+        "pk": comment.pk,
+        "comment": comment.comment,
+        "author": comment.author.username,
+        "name": comment.name,
+        "email": comment.email,
+        "website": comment.website,
+        "submit_date": str(comment.submit_date)
+    }
+
+
 @require_POST
 def post_comment(request, content_type_id, object_id, form_class=CommentForm):
     content_type = get_object_or_404(ContentType, pk=content_type_id)
@@ -29,15 +41,7 @@ def post_comment(request, content_type_id, object_id, form_class=CommentForm):
         if request.is_ajax():
             return HttpResponse(json.dumps({
                 "status": "OK",
-                "comment": {
-                    "pk": comment.pk,
-                    "comment": comment.comment,
-                    "author": comment.author.username,
-                    "name": comment.name,
-                    "email": comment.email,
-                    "website": comment.website,
-                    "submit_date": str(comment.submit_date)
-                }
+                "comment": dehydrate_comment(comment)
             }), mimetype="application/json")
     else:
         if request.is_ajax():
@@ -56,13 +60,14 @@ def post_comment(request, content_type_id, object_id, form_class=CommentForm):
 @require_POST
 def edit_comment(request, comment_id, form_class=CommentForm):
     comment = get_object_or_404(Comment, pk=comment_id)
-    form = form_class(request.POST, initial=comment, request=request, obj=comment.content_object, user=request.user)
+    form = form_class(request.POST, instance=comment, request=request, obj=comment.content_object, user=request.user)
     if form.is_valid():
         comment = form.save()
         comment_updated.send(sender=edit_comment, comment=comment, request=request)
         if request.is_ajax():
             return HttpResponse(json.dumps({
-                "status": "OK"
+                "status": "OK",
+                "comment": dehydrate_comment(comment)
             }), mimetype="application/json")
     else:
         if request.is_ajax():
