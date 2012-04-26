@@ -11,7 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from dialogos.authorization import load_can_delete, load_can_edit
 from dialogos.forms import CommentForm
 from dialogos.models import Comment
-from dialogos.signals import commented
+from dialogos.signals import commented, comment_updated
 
 
 can_delete = load_can_delete()
@@ -49,6 +49,31 @@ def post_comment(request, content_type_id, object_id, form_class=CommentForm):
     # light security check -- make sure redirect_to isn't garbage.
     if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
         redirect_to = obj
+    return redirect(redirect_to)
+
+
+@login_required
+@require_POST
+def edit_comment(request, comment_id, form_class=CommentForm):
+    comment = get_object_or_404(Comment, pk=comment_id)
+    form = form_class(request.POST, initial=comment, request=request, obj=comment.content_object, user=request.user)
+    if form.is_valid():
+        comment = form.save()
+        comment_updated.send(sender=edit_comment, comment=comment, request=request)
+        if request.is_ajax():
+            return HttpResponse(json.dumps({
+                "status": "OK"
+            }), mimetype="application/json")
+    else:
+        if request.is_ajax():
+            return HttpResponse(json.dumps({
+                "status": "ERROR",
+                "errors": form.errors
+            }), mimetype="application/json")
+    redirect_to = request.POST.get("next")
+    # light security check -- make sure redirect_to isn't garbage.
+    if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
+        redirect_to = comment.content_object
     return redirect(redirect_to)
 
 
