@@ -84,4 +84,9 @@ def delete_comment(request, comment_id):
     obj = comment.content_object
     if can_delete(request.user, comment):
         comment.delete()
+        if request.is_ajax():
+            return HttpResponse(json.dumps({"status": "OK"}))
+    else:
+        if request.is_ajax():
+            return HttpResponse(json.dumps({"status": "ERROR", "errors": "You do not have permission to delete this comment."}))
     return redirect(obj)
