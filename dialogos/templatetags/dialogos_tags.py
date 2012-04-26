@@ -3,11 +3,24 @@ from django.core.urlresolvers import reverse
 
 from django.contrib.contenttypes.models import ContentType
 
+from dialogos.authorization import load_can_delete, load_can_edit
 from dialogos.forms import CommentForm
 from dialogos.models import Comment
 
 
+can_delete = load_can_delete()
+can_edit = load_can_edit()
 register = template.Library()
+
+
+@register.filter
+def can_edit_comment(comment, user):
+    return can_edit(user, comment)
+
+
+@register.filter
+def can_delete_comment(comment, user):
+    return can_delete(user, comment)
 
 
 class BaseCommentNode(template.Node):
