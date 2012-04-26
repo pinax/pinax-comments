@@ -8,9 +8,14 @@ from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 
+from dialogos.authorization import load_can_delete, load_can_edit
 from dialogos.forms import CommentForm
 from dialogos.models import Comment
 from dialogos.signals import commented
+
+
+can_delete = load_can_delete()
+can_edit = load_can_edit()
 
 
 @require_POST
@@ -52,6 +57,6 @@ def post_comment(request, content_type_id, object_id, form_class=CommentForm):
 def delete_comment(request, comment_id):
     comment = get_object_or_404(Comment, pk=comment_id)
     obj = comment.content_object
-    if comment.author == request.user:
+    if can_delete(request.user, comment):
         comment.delete()
     return redirect(obj)
