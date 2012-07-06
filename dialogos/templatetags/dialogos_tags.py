@@ -24,7 +24,7 @@ def can_delete_comment(comment, user):
 
 
 class BaseCommentNode(template.Node):
-    
+
     @classmethod
     def handle_token(cls, parser, token):
         bits = token.split_contents()
@@ -34,23 +34,29 @@ class BaseCommentNode(template.Node):
             if bits[2] != "as":
                 raise template.TemplateSyntaxError("%r's 2nd argument must be 'as'" % bits[0])
             return cls(parser.compile_filter(bits[1]), bits[3])
+        elif len(bits) == 5:
+            return cls(parser.compile_filter(bits[1]), bits[3], bits[4])
         if cls.requires_as_var:
             args = "1 argument"
         else:
             args = "either 1 or 3 arguments"
         raise template.TemplateSyntaxError("%r takes %s" % (bits[0], args))
-    
-    def __init__(self, obj, varname=None):
+
+    def __init__(self, obj, varname=None, limit=None):
         self.obj = obj
         self.varname = varname
-    
+        self.limit = limit
+
     def get_comments(self, context):
         obj = self.obj.resolve(context)
         comments = Comment.objects.filter(
             object_id=obj.pk,
             content_type=ContentType.objects.get_for_model(obj)
-        )
-        return comments.order_by("submit_date")
+        ).order_by("submit_date")
+
+        if self.limit:
+            comments = comments[:self.limit]
+        return comments
 
 
 class CommentCountNode(BaseCommentNode):
