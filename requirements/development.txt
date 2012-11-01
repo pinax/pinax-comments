@@ -1,3 +1,0 @@
-Django==1.2.1
--e git+ssh://git@git.eldarion.com:1382/eldarion.git#egg=eldarion
-

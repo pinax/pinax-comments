@@ -21,7 +21,7 @@ def load_path_attr(path):
 
 
 def default_can_delete(user, comment):
-    if user.is_superuser():
+    if user.is_superuser:
         return True
     return user == comment.author
 
