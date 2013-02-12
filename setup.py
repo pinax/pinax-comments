@@ -3,7 +3,7 @@ from distutils.core import setup
 
 setup(
     name = "dialogos",
-    version = "0.2",
+    version = "0.3",
     author = "Eldarion",
     author_email = "development@eldarion.com",
     description = "a flaggable comments app",
