@@ -1,14 +1,13 @@
 import json
 
+from django.conf import settings
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
-
-from django.views.decorators.http import require_POST
 from django.shortcuts import get_object_or_404, redirect
 from django.template import RequestContext
 from django.template.loader import render_to_string
-
-from django.contrib.auth.decorators import login_required
-from django.contrib.contenttypes.models import ContentType
+from django.views.decorators.http import require_POST
 
 from dialogos.authorization import load_can_delete, load_can_edit
 from dialogos.forms import CommentForm
@@ -30,8 +29,11 @@ def dehydrate_comment(comment):
         "website": comment.website,
         "submit_date": str(comment.submit_date)
     }
+# Give user's the option to require login for comments
+COMMENT_REQUIRES_LOGIN = getattr(settings, "DIALOGOS_COMMENT_REQUIRES_LOGIN", False)
 
 
+@user_passes_test(test_func=lambda u: u.is_authenticated if COMMENT_REQUIRES_LOGIN else True)
 @require_POST
 def post_comment(request, content_type_id, object_id, form_class=CommentForm):
     content_type = get_object_or_404(ContentType, pk=content_type_id)
