@@ -1,5 +1,4 @@
-===============
-Dialogos README
-===============
+Dialogos 
+========
 
-Dialogos is a flaggable comments app.
+Dialogos is a comments app for Django.
