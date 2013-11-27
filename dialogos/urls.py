@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import url, patterns, include, handler404, handler500
+from django.conf.urls import url, patterns
 
 
 urlpatterns = patterns("dialogos.views",
