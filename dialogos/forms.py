@@ -6,13 +6,13 @@ from dialogos.models import Comment
 
 
 class CommentForm(forms.ModelForm):
-    
+
     class Meta:
         model = Comment
         fields = [
             "name", "email", "website", "comment"
         ]
-    
+
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request", None)
         self.obj = kwargs.pop("obj")
@@ -22,7 +22,7 @@ class CommentForm(forms.ModelForm):
             del self.fields["name"]
             del self.fields["email"]
             del self.fields["website"]
-    
+
     def save(self, commit=True):
         comment = super(CommentForm, self).save(commit=False)
         comment.ip_address = self.request.META.get("REMOTE_ADDR", None)

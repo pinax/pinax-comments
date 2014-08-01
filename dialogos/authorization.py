@@ -32,17 +32,17 @@ def default_can_edit(user, comment):
 
 def load_can_delete():
     import_path = getattr(settings, "COMMENTS_CAN_DELETE_CALLABLE", None)
-    
+
     if import_path is None:
         return default_can_delete
-    
+
     return load_path_attr(import_path)
 
 
 def load_can_edit():
     import_path = getattr(settings, "COMMENTS_CAN_EDIT_CALLABLE", None)
-    
+
     if import_path is None:
         return default_can_edit
-    
+
     return load_path_attr(import_path)
