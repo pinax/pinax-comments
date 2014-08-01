@@ -66,7 +66,8 @@ class CommentTests(TestCaseMixin, TestCase):
         self.assertEqual(tmpl.render(context), value)
 
     def post_comment(self, obj, data):
-        return self.post("post_comment",
+        return self.post(
+            "post_comment",
             content_type_id=ContentType.objects.get_for_model(obj).pk,
             object_id=obj.pk,
             data=data
