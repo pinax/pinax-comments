@@ -2,7 +2,7 @@ from django import forms
 
 from django.contrib.contenttypes.models import ContentType
 
-from dialogos.models import Comment
+from .models import Comment
 
 
 class CommentForm(forms.ModelForm):

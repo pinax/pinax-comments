@@ -1,11 +1,13 @@
+from __future__ import unicode_literals
+
 from django import template
 from django.core.urlresolvers import reverse
 
 from django.contrib.contenttypes.models import ContentType
 
-from dialogos.authorization import load_can_delete, load_can_edit
-from dialogos.forms import CommentForm
-from dialogos.models import Comment
+from ..authorization import load_can_delete, load_can_edit
+from ..forms import CommentForm
+from ..models import Comment
 
 
 can_delete = load_can_delete()
@@ -62,7 +64,7 @@ class CommentCountNode(BaseCommentNode):
         if self.varname is not None:
             context[self.varname] = comments
             return ""
-        return unicode(comments)
+        return comments
 
 
 class CommentsNode(BaseCommentNode):

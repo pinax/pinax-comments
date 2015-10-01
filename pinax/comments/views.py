@@ -10,10 +10,10 @@ from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 
-from dialogos.authorization import load_can_delete, load_can_edit
-from dialogos.forms import CommentForm
-from dialogos.models import Comment
-from dialogos.signals import commented, comment_updated
+from .authorization import load_can_delete, load_can_edit
+from .forms import CommentForm
+from .models import Comment
+from .signals import commented, comment_updated
 
 
 can_delete = load_can_delete()
@@ -44,7 +44,7 @@ def post_comment(request, content_type_id, object_id, form_class=CommentForm):
             return HttpResponse(json.dumps({
                 "status": "OK",
                 "comment": dehydrate_comment(comment),
-                "html": render_to_string("dialogos/_comment.html", {
+                "html": render_to_string("pinax/comments/_comment.html", {
                     "comment": comment
                 }, context_instance=RequestContext(request))
             }), mimetype="application/json")
@@ -53,7 +53,7 @@ def post_comment(request, content_type_id, object_id, form_class=CommentForm):
             return HttpResponse(json.dumps({
                 "status": "ERROR",
                 "errors": form.errors,
-                "html": render_to_string("dialogos/_form.html", {
+                "html": render_to_string("pinax/comments/_form.html", {
                     "form": form,
                     "obj": obj
                 }, context_instance=RequestContext(request))

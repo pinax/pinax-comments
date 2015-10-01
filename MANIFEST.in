@@ -1,2 +1,5 @@
+include AUTHORS
 include LICENSE
 include README.rst
+recursive-include pinax/comments/static *
+recursive-include pinax/comments/templates *

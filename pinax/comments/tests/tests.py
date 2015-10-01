@@ -5,8 +5,10 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 
-from dialogos.forms import CommentForm
-from dialogos.models import Comment
+from pinax.comments.forms import CommentForm
+from pinax.comments.models import Comment
+
+from .models import Demo
 
 
 class login(object):
@@ -74,9 +76,9 @@ class CommentTests(TestCaseMixin, TestCase):
         )
 
     def test_post_comment(self):
-        g = User.objects.create(username="Gandalf")
+        d = Demo.objects.create(name="Wizard")
 
-        response = self.post_comment(g, data={
+        response = self.post_comment(d, data={
             "name": "Frodo Baggins",
             "comment": "Where'd you go?",
         })
@@ -87,13 +89,13 @@ class CommentTests(TestCaseMixin, TestCase):
         self.assertEqual(c.author, None)
         self.assertEqual(c.name, "Frodo Baggins")
 
-        response = self.post_comment(g, data={
+        response = self.post_comment(d, data={
             "comment": "Where is everyone?"
         })
         self.assertEqual(Comment.objects.count(), 1)
 
         with self.login("gimli", "gloin"):
-            response = self.post_comment(g, data={
+            response = self.post_comment(d, data={
                 "comment": "I thought you were watching the hobbits?"
             })
             self.assertEqual(response.status_code, 302)
@@ -104,9 +106,9 @@ class CommentTests(TestCaseMixin, TestCase):
             self.assertEqual(c.author, self.user)
 
     def test_delete_comment(self):
-        g = User.objects.create(username="Boromir")
+        d = Demo.objects.create(name="Wizard")
         with self.login("gimli", "gloin"):
-            response = self.post_comment(g, data={
+            response = self.post_comment(d, data={
                 "comment": "Wow, you're a jerk.",
             })
             comment = Comment.objects.get()
@@ -126,64 +128,64 @@ class CommentTests(TestCaseMixin, TestCase):
             self.assertEqual(Comment.objects.count(), 0)
 
     def test_ttag_comment_count(self):
-        g = User.objects.create(username="Sauron")
-        self.post_comment(g, data={
+        d = Demo.objects.create(name="Wizard")
+        self.post_comment(d, data={
             "name": "Gandalf",
             "comment": "You can't win",
         })
-        self.post_comment(g, data={
+        self.post_comment(d, data={
             "name": "Gollum",
             "comment": "We wants our precious",
         })
 
         self.assert_renders(
-            "{% load dialogos_tags %}{% comment_count o %}",
-            Context({"o": g}),
+            "{% load pinax_comments_tags %}{% comment_count o %}",
+            Context({"o": d}),
             "2"
         )
 
     def test_ttag_comments(self):
-        g = User.objects.create(username="Sauron")
-        self.post_comment(g, data={
+        d = Demo.objects.create(name="Wizard")
+        self.post_comment(d, data={
             "name": "Gandalf",
             "comment": "You can't win",
         })
-        self.post_comment(g, data={
+        self.post_comment(d, data={
             "name": "Gollum",
             "comment": "We wants our precious",
         })
 
-        c = Context({"o": g})
+        c = Context({"o": d})
         self.assert_renders(
-            "{% load dialogos_tags %}{% comments o as cs %}",
+            "{% load pinax_comments_tags %}{% comments o as cs %}",
             c,
             ""
         )
         self.assertEqual(list(c["cs"]), list(Comment.objects.all()))
 
     def test_ttag_comment_form(self):
-        g = User.objects.create(username="Sauron")
-        c = Context({"o": g})
+        d = Demo.objects.create(name="Wizard")
+        c = Context({"o": d})
         self.assert_renders(
-            "{% load dialogos_tags %}{% comment_form o as comment_form %}",
+            "{% load pinax_comments_tags %}{% comment_form o as comment_form %}",
             c,
             ""
         )
         self.assertTrue(isinstance(c["comment_form"], CommentForm))
 
         with self.login("gimli", "gloin"):
-            c = Context({"o": g, "user": self.user})
+            c = Context({"o": d, "user": self.user})
             self.assert_renders(
-                "{% load dialogos_tags %}{% comment_form o as comment_form %}",
+                "{% load pinax_comments_tags %}{% comment_form o as comment_form %}",
                 c,
                 ""
             )
             self.assertTrue(isinstance(c["comment_form"], CommentForm))
 
     def test_ttag_comment_target(self):
-        g = User.objects.create(username="legolas")
+        d = Demo.objects.create(name="Wizard")
         self.assert_renders(
-            "{% load dialogos_tags %}{% comment_target o %}",
-            Context({"o": g}),
-            "/comment/%d/%d/" % (ContentType.objects.get_for_model(g).pk, g.pk)
+            "{% load pinax_comments_tags %}{% comment_target o %}",
+            Context({"o": d}),
+            "/comment/%d/%d/" % (ContentType.objects.get_for_model(d).pk, d.pk)
         )
