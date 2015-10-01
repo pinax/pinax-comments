@@ -11,11 +11,15 @@ DEFAULT_SETTINGS = dict(
     INSTALLED_APPS=[
         "django.contrib.auth",
         "django.contrib.contenttypes",
+        "django.contrib.sessions",
         "django.contrib.sites",
         "pinax.comments",
         "pinax.comments.tests"
     ],
-    MIDDLEWARE_CLASSES=[],
+    MIDDLEWARE_CLASSES=[
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+    ],
     DATABASES={
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
