@@ -1,12 +1,14 @@
 from datetime import datetime
 
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 
 
+@python_2_unicode_compatible
 class Comment(models.Model):
 
     author = models.ForeignKey(User, null=True, related_name="comments")
@@ -25,5 +27,5 @@ class Comment(models.Model):
     ip_address = models.IPAddressField(null=True)
     public = models.BooleanField(default=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return "pk=%d" % self.pk

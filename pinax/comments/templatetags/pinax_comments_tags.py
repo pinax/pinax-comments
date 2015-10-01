@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django import template
 from django.core.urlresolvers import reverse
 
@@ -62,7 +64,7 @@ class CommentCountNode(BaseCommentNode):
         if self.varname is not None:
             context[self.varname] = comments
             return ""
-        return unicode(comments)
+        return comments
 
 
 class CommentsNode(BaseCommentNode):
