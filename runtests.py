@@ -29,6 +29,15 @@ DEFAULT_SETTINGS = dict(
     SITE_ID=1,
     ROOT_URLCONF="pinax.comments.tests.urls",
     SECRET_KEY="notasecret",
+    TEMPLATES = [
+        {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [],
+            "APP_DIRS": True,
+            "OPTIONS": {
+            },
+        },
+     ]
 )
 
 
