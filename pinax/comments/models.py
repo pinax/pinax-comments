@@ -24,7 +24,7 @@ class Comment(models.Model):
     comment = models.TextField()
 
     submit_date = models.DateTimeField(default=datetime.now)
-    ip_address = models.IPAddressField(null=True)
+    ip_address = models.GenericIPAddressField(null=True)
     public = models.BooleanField(default=True)
 
     def __str__(self):
