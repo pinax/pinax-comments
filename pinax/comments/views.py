@@ -1,8 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ImproperlyConfigured
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.shortcuts import resolve_url
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
@@ -17,7 +17,25 @@ can_delete = load_can_delete()
 can_edit = load_can_edit()
 
 
-class CommentCreateView(CreateView):
+class CommentSecureRedirectToMixin(object):
+
+    def get_secure_redirect_to(self, object=None):
+        redirect_to = self.request.POST.get("next")
+        # light security check -- make sure redirect_to isn't garbage.
+        if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
+            try:
+                if object is not None:
+                    url = object.get_absolute_url()
+                elif self.object is not None:
+                    url = self.object.content_object.get_absolute_url()
+            except AttributeError:
+                raise ImproperlyConfigured(
+                    "No URL to redirect to.  Either provide a url or define"
+                    " a get_absolute_url method on the Model.")
+        return redirect_to
+
+
+class CommentCreateView(CommentSecureRedirectToMixin, CreateView):
     form_class = CommentForm
     content_object = None
 
@@ -47,7 +65,7 @@ class CommentCreateView(CreateView):
                 }, context_instance=RequestContext(self.request))
             }
             return JsonResponse(data)
-        return HttpResponseRedirect(self.get_success_url())
+        return HttpResponseRedirect(self.get_secure_redirect_to(self.content_object))
 
     def form_invalid(self, form):
         if self.request.is_ajax():
@@ -60,18 +78,11 @@ class CommentCreateView(CreateView):
                 }, context_instance=RequestContext(self.request))
             }
             return JsonResponse(data)
-        return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        redirect_to = self.request.POST.get("next")
-        # light security check -- make sure redirect_to isn't garbage.
-        if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
-            redirect_to = self.content_object
-        return resolve_url(redirect_to)
+        return HttpResponseRedirect(self.get_secure_redirect_to(self.content_object))
 
 
 @method_decorator(login_required, name='dispatch')
-class CommentUpdateView(UpdateView):
+class CommentUpdateView(CommentSecureRedirectToMixin, UpdateView):
     model = Comment
     form_class = CommentForm
 
@@ -93,7 +104,7 @@ class CommentUpdateView(UpdateView):
                 "comment": self.object.data
             }
             return JsonResponse(data)
-        return HttpResponseRedirect(self.get_success_url())
+        return HttpResponseRedirect(self.get_secure_redirect_to())
 
     def form_invalid(self, form):
         if self.request.is_ajax():
@@ -102,30 +113,16 @@ class CommentUpdateView(UpdateView):
                 "errors": form.errors
             }
             return JsonResponse(data)
-        return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        redirect_to = self.request.POST.get("next")
-        # light security check -- make sure redirect_to isn't garbage.
-        if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
-            redirect_to = self.object.content_object
-        return redirect_to
+        return HttpResponseRedirect(self.get_secure_redirect_to())
 
 
 @method_decorator(login_required, name='dispatch')
-class CommentDeleteView(DeleteView):
+class CommentDeleteView(CommentSecureRedirectToMixin, DeleteView):
     model = Comment
-
-    def get_success_url(self):
-        redirect_to = self.request.POST.get("next")
-        # light security check -- make sure redirect_to isn't garbage.
-        if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
-            redirect_to = self.object.content_object.get_absolute_url()
-        return redirect_to
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        success_url = self.get_success_url()
+        success_url = self.get_secure_redirect_to()
         print(success_url)
         if can_delete(request.user, self.object):
             self.object.delete()
@@ -134,6 +131,4 @@ class CommentDeleteView(DeleteView):
         else:
             if request.is_ajax():
                 return JsonResponse({"status": "ERROR", "errors": "You do not have permission to delete this comment."})
-
-        print(success_url)
         return HttpResponseRedirect(success_url)
