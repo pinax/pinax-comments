@@ -113,17 +113,17 @@ class CommentTests(TestCaseMixin, TestCase):
             })
             comment = Comment.objects.get()
 
-        response = self.post("delete_comment", comment_id=comment.pk)
+        response = self.post("delete_comment", pk=comment.pk)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Comment.objects.count(), 1)
 
         with self.login("aragorn", "strider"):
-            response = self.post("delete_comment", comment_id=comment.pk)
+            response = self.post("delete_comment", pk=comment.pk)
             self.assertEqual(response.status_code, 302)
             self.assertEqual(Comment.objects.count(), 1)
 
         with self.login("gimli", "gloin"):
-            response = self.post("delete_comment", comment_id=comment.pk)
+            response = self.post("delete_comment", pk=comment.pk)
             self.assertEqual(response.status_code, 302)
             self.assertEqual(Comment.objects.count(), 0)
 

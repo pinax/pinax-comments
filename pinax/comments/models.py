@@ -27,5 +27,16 @@ class Comment(models.Model):
     ip_address = models.GenericIPAddressField(null=True)
     public = models.BooleanField(default=True)
 
+    def data(self):
+        return {
+            "pk": self.pk,
+            "comment": self.comment,
+            "author": self.author.username,
+            "name": self.name,
+            "email": self.email,
+            "website": self.website,
+            "submit_date": str(self.submit_date)
+        }
+
     def __str__(self):
         return "pk=%d" % self.pk

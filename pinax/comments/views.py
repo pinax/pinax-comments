@@ -1,106 +1,139 @@
-import json
-
-from django.http import HttpResponse
-
-from django.views.decorators.http import require_POST
-from django.shortcuts import get_object_or_404, redirect
-from django.template import RequestContext
-from django.template.loader import render_to_string
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import get_object_or_404
+from django.shortcuts import resolve_url
+from django.template import RequestContext
+from django.template.loader import render_to_string
+from django.utils.decorators import method_decorator
+from django.views.generic import CreateView, UpdateView, DeleteView
 
 from .authorization import load_can_delete, load_can_edit
 from .forms import CommentForm
 from .models import Comment
 from .signals import commented, comment_updated
 
-
 can_delete = load_can_delete()
 can_edit = load_can_edit()
 
 
-def dehydrate_comment(comment):
-    return {
-        "pk": comment.pk,
-        "comment": comment.comment,
-        "author": comment.author.username,
-        "name": comment.name,
-        "email": comment.email,
-        "website": comment.website,
-        "submit_date": str(comment.submit_date)
-    }
+class CommentCreateView(CreateView):
+    form_class = CommentForm
+    content_object = None
 
+    def get_form_kwargs(self):
+        kwargs = super(CommentCreateView, self).get_form_kwargs()
+        kwargs.update({
+            'request': self.request,
+            'obj': self.content_object,
+            'user': self.request.user,
+        })
+        return kwargs
 
-@require_POST
-def post_comment(request, content_type_id, object_id, form_class=CommentForm):
-    content_type = get_object_or_404(ContentType, pk=content_type_id)
-    obj = get_object_or_404(content_type.model_class(), pk=object_id)
-    form = form_class(request.POST, request=request, obj=obj, user=request.user)
-    if form.is_valid():
-        comment = form.save()
-        commented.send(sender=post_comment, comment=comment, request=request)
-        if request.is_ajax():
-            return HttpResponse(json.dumps({
+    def post(self, request, *args, **kwargs):
+        content_type = get_object_or_404(ContentType, pk=self.kwargs.get('content_type_id'))
+        self.content_object = content_type.get_object_for_this_type(pk=self.kwargs.get('object_id'))
+        return super(CommentCreateView, self).post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        self.object = form.save()
+        commented.send(sender=self.content_object, comment=self.object, request=self.request)
+        if self.request.is_ajax():
+            data = {
                 "status": "OK",
-                "comment": dehydrate_comment(comment),
+                "comment": self.object.data,
                 "html": render_to_string("pinax/comments/_comment.html", {
-                    "comment": comment
-                }, context_instance=RequestContext(request))
-            }), mimetype="application/json")
-    else:
-        if request.is_ajax():
-            return HttpResponse(json.dumps({
+                    "comment": self.object
+                }, context_instance=RequestContext(self.request))
+            }
+            return JsonResponse(data)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        if self.request.is_ajax():
+            data = {
                 "status": "ERROR",
                 "errors": form.errors,
                 "html": render_to_string("pinax/comments/_form.html", {
                     "form": form,
-                    "obj": obj
-                }, context_instance=RequestContext(request))
-            }), mimetype="application/json")
-    redirect_to = request.POST.get("next")
-    # light security check -- make sure redirect_to isn't garbage.
-    if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
-        redirect_to = obj
-    return redirect(redirect_to)
+                    "obj": self.content_object
+                }, context_instance=RequestContext(self.request))
+            }
+            return JsonResponse(data)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        redirect_to = self.request.POST.get("next")
+        # light security check -- make sure redirect_to isn't garbage.
+        if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
+            redirect_to = self.content_object
+        return resolve_url(redirect_to)
 
 
-@login_required
-@require_POST
-def edit_comment(request, comment_id, form_class=CommentForm):
-    comment = get_object_or_404(Comment, pk=comment_id)
-    form = form_class(request.POST, instance=comment, request=request, obj=comment.content_object, user=request.user)
-    if form.is_valid():
-        comment = form.save()
-        comment_updated.send(sender=edit_comment, comment=comment, request=request)
-        if request.is_ajax():
-            return HttpResponse(json.dumps({
+@method_decorator(login_required, name='dispatch')
+class CommentUpdateView(UpdateView):
+    model = Comment
+    form_class = CommentForm
+
+    def get_form_kwargs(self):
+        kwargs = super(CommentUpdateView, self).get_form_kwargs()
+        kwargs.update({
+            'request': self.request,
+            'obj': self.object.content_object,
+            'user': self.request.user,
+        })
+        return kwargs
+
+    def form_valid(self, form):
+        self.object = form.save()
+        comment_updated.send(sender=self.object.content_object, comment=self.object, request=self.request)
+        if self.request.is_ajax():
+            data = {
                 "status": "OK",
-                "comment": dehydrate_comment(comment)
-            }), mimetype="application/json")
-    else:
-        if request.is_ajax():
-            return HttpResponse(json.dumps({
+                "comment": self.object.data
+            }
+            return JsonResponse(data)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        if self.request.is_ajax():
+            data = {
                 "status": "ERROR",
                 "errors": form.errors
-            }), mimetype="application/json")
-    redirect_to = request.POST.get("next")
-    # light security check -- make sure redirect_to isn't garbage.
-    if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
-        redirect_to = comment.content_object
-    return redirect(redirect_to)
+            }
+            return JsonResponse(data)
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        redirect_to = self.request.POST.get("next")
+        # light security check -- make sure redirect_to isn't garbage.
+        if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
+            redirect_to = self.object.content_object
+        return redirect_to
 
 
-@login_required
-@require_POST
-def delete_comment(request, comment_id):
-    comment = get_object_or_404(Comment, pk=comment_id)
-    obj = comment.content_object
-    if can_delete(request.user, comment):
-        comment.delete()
-        if request.is_ajax():
-            return HttpResponse(json.dumps({"status": "OK"}))
-    else:
-        if request.is_ajax():
-            return HttpResponse(json.dumps({"status": "ERROR", "errors": "You do not have permission to delete this comment."}))
-    return redirect(obj)
+@method_decorator(login_required, name='dispatch')
+class CommentDeleteView(DeleteView):
+    model = Comment
+
+    def get_success_url(self):
+        redirect_to = self.request.POST.get("next")
+        # light security check -- make sure redirect_to isn't garbage.
+        if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
+            redirect_to = self.object.content_object.get_absolute_url()
+        return redirect_to
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        print(success_url)
+        if can_delete(request.user, self.object):
+            self.object.delete()
+            if request.is_ajax():
+                return JsonResponse({"status": "OK"})
+        else:
+            if request.is_ajax():
+                return JsonResponse({"status": "ERROR", "errors": "You do not have permission to delete this comment."})
+
+        print(success_url)
+        return HttpResponseRedirect(success_url)
