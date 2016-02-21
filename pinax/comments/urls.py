@@ -4,10 +4,7 @@ from . import views
 
 
 urlpatterns = [
-    url(r"^comment/(?P<content_type_id>\d+)/(?P<object_id>\d+)/$", views.post_comment,
-        name="post_comment"),
-    url(r"^comment/(?P<comment_id>\d+)/delete/$", views.delete_comment,
-        name="delete_comment"),
-    url(r"^comment/(?P<comment_id>\d+)/edit/$", views.edit_comment,
-        name="edit_comment"),
+    url(r"^(?P<content_type_id>\d+)/(?P<object_id>\d+)/$", views.CommentCreateView.as_view(), name="post_comment"),
+    url(r"^(?P<pk>\d+)/delete/$", views.CommentDeleteView.as_view(), name="delete_comment"),
+    url(r"^(?P<pk>\d+)/edit/$", views.CommentUpdateView.as_view(), name="edit_comment"),
 ]
