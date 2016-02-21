@@ -42,15 +42,15 @@ class CommentCreateView(CommentSecureRedirectToMixin, CreateView):
     def get_form_kwargs(self):
         kwargs = super(CommentCreateView, self).get_form_kwargs()
         kwargs.update({
-            'request': self.request,
-            'obj': self.content_object,
-            'user': self.request.user,
+            "request": self.request,
+            "obj": self.content_object,
+            "user": self.request.user,
         })
         return kwargs
 
     def post(self, request, *args, **kwargs):
-        content_type = get_object_or_404(ContentType, pk=self.kwargs.get('content_type_id'))
-        self.content_object = content_type.get_object_for_this_type(pk=self.kwargs.get('object_id'))
+        content_type = get_object_or_404(ContentType, pk=self.kwargs.get("content_type_id"))
+        self.content_object = content_type.get_object_for_this_type(pk=self.kwargs.get("object_id"))
         return super(CommentCreateView, self).post(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -81,7 +81,7 @@ class CommentCreateView(CommentSecureRedirectToMixin, CreateView):
         return HttpResponseRedirect(self.get_secure_redirect_to(self.content_object))
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class CommentUpdateView(CommentSecureRedirectToMixin, UpdateView):
     model = Comment
     form_class = CommentForm
@@ -89,9 +89,9 @@ class CommentUpdateView(CommentSecureRedirectToMixin, UpdateView):
     def get_form_kwargs(self):
         kwargs = super(CommentUpdateView, self).get_form_kwargs()
         kwargs.update({
-            'request': self.request,
-            'obj': self.object.content_object,
-            'user': self.request.user,
+            "request": self.request,
+            "obj": self.object.content_object,
+            "user": self.request.user,
         })
         return kwargs
 
@@ -116,14 +116,13 @@ class CommentUpdateView(CommentSecureRedirectToMixin, UpdateView):
         return HttpResponseRedirect(self.get_secure_redirect_to())
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class CommentDeleteView(CommentSecureRedirectToMixin, DeleteView):
     model = Comment
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         success_url = self.get_secure_redirect_to()
-        print(success_url)
         if can_delete(request.user, self.object):
             self.object.delete()
             if request.is_ajax():
