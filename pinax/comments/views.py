@@ -25,9 +25,9 @@ class CommentSecureRedirectToMixin(object):
         if not redirect_to or " " in redirect_to or redirect_to.startswith("http"):
             try:
                 if object is not None:
-                    url = object.get_absolute_url()
+                    redirect_to = object.get_absolute_url()
                 elif self.object is not None:
-                    url = self.object.content_object.get_absolute_url()
+                    redirect_to = self.object.content_object.get_absolute_url()
             except AttributeError:
                 raise ImproperlyConfigured(
                     "No URL to redirect to.  Either provide a url or define"
