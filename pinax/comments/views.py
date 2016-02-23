@@ -1,12 +1,14 @@
-from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.template import RequestContext
 from django.template.loader import render_to_string
-from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, UpdateView, DeleteView
+try:
+    from account.mixins import LoginRequiredMixin
+except ImportError:
+    from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .authorization import load_can_delete, load_can_edit
 from .forms import CommentForm
@@ -81,8 +83,7 @@ class CommentCreateView(CommentSecureRedirectToMixin, CreateView):
         return HttpResponseRedirect(self.get_secure_redirect_to(self.content_object))
 
 
-@method_decorator(login_required, name="dispatch")
-class CommentUpdateView(CommentSecureRedirectToMixin, UpdateView):
+class CommentUpdateView(LoginRequiredMixin, CommentSecureRedirectToMixin, UpdateView):
     model = Comment
     form_class = CommentForm
 
@@ -116,8 +117,7 @@ class CommentUpdateView(CommentSecureRedirectToMixin, UpdateView):
         return HttpResponseRedirect(self.get_secure_redirect_to())
 
 
-@method_decorator(login_required, name="dispatch")
-class CommentDeleteView(CommentSecureRedirectToMixin, DeleteView):
+class CommentDeleteView(LoginRequiredMixin, CommentSecureRedirectToMixin, DeleteView):
     model = Comment
 
     def post(self, request, *args, **kwargs):
