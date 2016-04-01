@@ -19,6 +19,9 @@ setup(
     version="0.1",
     url="http://github.com/pinax/pinax-comments/",
     license="MIT",
+    install_requires=[
+        "django-appconf>=1.0.1"
+    ],
     packages=find_packages(),
     package_data={
         "comments": []
