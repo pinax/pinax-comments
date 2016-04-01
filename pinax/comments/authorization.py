@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from .conf import settings
 
 
@@ -14,14 +12,14 @@ def default_can_edit(user, comment):
 
 
 def load_can_delete():
-    import_path = settings.PINAX_COMMENTS_CAN_EDIT_CALLABLE
+    import_path = settings.COMMENTS_CAN_EDIT_CALLABLE
 
     if import_path is None:
         return default_can_delete
 
 
 def load_can_edit():
-    import_path = settings.PINAX_COMMENTS_CAN_EDIT_CALLABLE
+    import_path = settings.COMMENTS_CAN_EDIT_CALLABLE
 
     if import_path is None:
         return default_can_edit
