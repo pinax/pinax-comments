@@ -3,11 +3,7 @@ from __future__ import unicode_literals
 from appconf import AppConf
 from django.conf import settings  # noqa
 from django.core.exceptions import ImproperlyConfigured
-
-try:
-    from django.utils.importlib import import_module
-except ImportError:
-    import importlib  # noqa
+import importlib
 
 
 def load_path_attr(path):
