@@ -1,12 +1,9 @@
 from __future__ import unicode_literals
 
-
-from django.conf import settings
-
 from appconf import AppConf
+from django.conf import settings
 
 
 class CommentsAppConf(AppConf):
-
-    COMMENTS_CAN_DELETE_CALLABLE = True
-    COMMENTS_CAN_EDIT_CALLABLE = True
+    CAN_DELETE_CALLABLE = True
+    CAN_EDIT_CALLABLE = True
