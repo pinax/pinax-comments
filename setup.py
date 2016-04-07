@@ -20,7 +20,7 @@ setup(
     url="http://github.com/pinax/pinax-comments/",
     license="MIT",
     install_requires=[
-        "django-appconf>=1.0.1"
+        "django-appconf>=1.0.1",
     ],
     packages=find_packages(),
     package_data={
@@ -28,6 +28,9 @@ setup(
     },
     test_suite="runtests.runtests",
     tests_require=[
+        "django-test-plus>=1.0.11",
+        "django-appconf>=1.0.1",
+        "django-user-accounts>=1.3.1",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
