@@ -28,7 +28,6 @@ def can_delete_comment(comment, user):
 def comment_count(object):
     """
     Usage:
-
         {% comment_count obj %}
     or
         {% comment_count obj as var %}
@@ -43,7 +42,6 @@ def comment_count(object):
 def comments(object):
     """
     Usage:
-
         {% comments obj as var %}
     """
     return Comment.objects.filter(
@@ -56,9 +54,7 @@ def comments(object):
 def comment_form(context, object):
     """
     Usage:
-
         {% comment_form obj as comment_form %}
-
     Will read the `user` var out of the contex to know if the form should be
     form an auth'd user or not.
     """
@@ -72,7 +68,9 @@ def comment_form(context, object):
 def comment_target(object):
     """
     Usage:
-
         {% comment_target obj [as varname] %}
     """
-    return reverse("pinax_comments:post_comment", args=[ContentType.objects.get_for_model(object).pk, object.pk])
+    return reverse("post_comment", kwargs={
+        "content_type_id": ContentType.objects.get_for_model(object).pk,
+        "object_id": object.pk
+    })
