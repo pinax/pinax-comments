@@ -9,11 +9,9 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
@@ -30,8 +28,11 @@ class Migration(migrations.Migration):
                 ('submit_date', models.DateTimeField(default=datetime.datetime.now)),
                 ('ip_address', models.GenericIPAddressField(null=True)),
                 ('public', models.BooleanField(default=True)),
-                ('author', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='comments', to=settings.AUTH_USER_MODEL)),
-                ('content_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='contenttypes.ContentType')),
+                ('author',
+                 models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='comments',
+                                   to=settings.AUTH_USER_MODEL)),
+                ('content_type',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='contenttypes.ContentType')),
             ],
         ),
     ]
