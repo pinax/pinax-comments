@@ -1,53 +1,34 @@
 from django.core.urlresolvers import reverse
 from django.template import Template, Context
-from django.test import TestCase
 
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 
 from pinax.comments.forms import CommentForm
 from pinax.comments.models import Comment
 
 from .models import Demo
+from .test import TestCase
 
 
-class login(object):
-    def __init__(self, testcase, user, password):
-        self.testcase = testcase
-        success = testcase.client.login(username=user, password=password)
-        self.testcase.assertTrue(
-            success,
-            "login with username=%r, password=%r failed" % (user, password)
-        )
-
-    def __enter__(self):
-        pass
-
-    def __exit__(self, *args):
-        self.testcase.client.logout()
-
-
-class TestCaseMixin(object):
+class TestCaseMixin(TestCase):
     def get(self, url_name, *args, **kwargs):
         data = kwargs.pop("data", {})
-        return self.client.get(reverse(url_name, args=args, kwargs=kwargs), data)
+        return self.get(reverse(url_name, args=args, kwargs=kwargs), data)
 
     def getajax(self, url_name, *args, **kwargs):
         data = kwargs.pop("data", {})
-        return self.client.get(reverse(url_name, args=args, kwargs=kwargs), data,
-                               HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+        return self.get(reverse(url_name, args=args, kwargs=kwargs), data,
+                        HTTP_X_REQUESTED_WITH="XMLHttpRequest")
 
-    def post(self, url_name, *args, **kwargs):
-        data = kwargs.pop("data", {})
-        return self.client.post(reverse(url_name, args=args, kwargs=kwargs), data)
+    def post_comment_2(self, url_name, *args, **kwargs):
+        # data = kwargs.get("data", {})
+        url_name = "pinax_comments:" + url_name
+        return self.post(url_name, args=args, kwargs=kwargs)
 
     def postajax(self, url_name, *args, **kwargs):
         data = kwargs.pop("data", {})
-        return self.client.post(reverse(url_name, args=args, kwargs=kwargs), data,
-                                HTTP_X_REQUESTED_WITH="XMLHttpRequest")
-
-    def login(self, user, password):
-        return login(self, user, password)
+        return self.post(reverse(url_name, args=args, kwargs=kwargs), data,
+                         HTTP_X_REQUESTED_WITH="XMLHttpRequest")
 
     def reload(self, obj):
         return obj.__class__._default_manager.get(pk=obj.pk)
@@ -57,11 +38,11 @@ class TestCaseMixin(object):
         self.assertEqual(tmpl.render(context), value)
 
 
-class CommentTests(TestCaseMixin, TestCase):
-
+class CommentTests(TestCaseMixin):
     def setUp(self):
-        self.user = User.objects.create_user("gimli", "myaxe@dwarf.org", "gloin")
-        self.user2 = User.objects.create_user("aragorn", "theking@gondor.gov", "strider")
+        super(CommentTests, self).setUp()
+        self.gimli = self.make_user(username="gimli")
+        self.aragorn = self.make_user(username="aragorn")
 
     def assert_renders(self, tmpl, context, value):
         tmpl = Template(tmpl)
@@ -69,7 +50,7 @@ class CommentTests(TestCaseMixin, TestCase):
 
     def post_comment(self, obj, data):
         return self.post(
-            "post_comment",
+            "pinax_comments:post_comment",
             content_type_id=ContentType.objects.get_for_model(obj).pk,
             object_id=obj.pk,
             data=data
@@ -82,7 +63,7 @@ class CommentTests(TestCaseMixin, TestCase):
             "name": "Frodo Baggins",
             "comment": "Where'd you go?",
         })
-        self.assertEqual(response.status_code, 302)
+        self.response_302(response)
 
         self.assertEqual(Comment.objects.count(), 1)
         c = Comment.objects.get()
@@ -94,36 +75,35 @@ class CommentTests(TestCaseMixin, TestCase):
         })
         self.assertEqual(Comment.objects.count(), 1)
 
-        with self.login("gimli", "gloin"):
+        with self.login(self.gimli):
             response = self.post_comment(d, data={
                 "comment": "I thought you were watching the hobbits?"
             })
-            self.assertEqual(response.status_code, 302)
+            self.response_302(response)
             self.assertEqual(Comment.objects.count(), 2)
 
             c = Comment.objects.order_by("id")[1]
             self.assertEqual(c.comment, "I thought you were watching the hobbits?")
-            self.assertEqual(c.author, self.user)
+            self.assertEqual(c.author, self.gimli)
 
     def test_delete_comment(self):
         d = Demo.objects.create(name="Wizard")
-        with self.login("gimli", "gloin"):
+        with self.login(self.gimli):
             response = self.post_comment(d, data={
                 "comment": "Wow, you're a jerk.",
             })
             comment = Comment.objects.get()
-
-        response = self.post("delete_comment", pk=comment.pk)
-        self.assertEqual(response.status_code, 302)
+        response = self.post("pinax_comments:delete_comment", pk=comment.pk)
+        self.response_404(response)
         self.assertEqual(Comment.objects.count(), 1)
 
-        with self.login("aragorn", "strider"):
-            response = self.post("delete_comment", pk=comment.pk)
+        with self.login(self.aragorn):
+            response = self.post("pinax_comments:delete_comment", pk=comment.pk)
             self.assertEqual(response.status_code, 302)
             self.assertEqual(Comment.objects.count(), 1)
 
-        with self.login("gimli", "gloin"):
-            response = self.post("delete_comment", pk=comment.pk)
+        with self.login(self.gimli):
+            response = self.post("pinax_comments:delete_comment", pk=comment.pk)
             self.assertEqual(response.status_code, 302)
             self.assertEqual(Comment.objects.count(), 0)
 
@@ -157,26 +137,26 @@ class CommentTests(TestCaseMixin, TestCase):
 
         c = Context({"o": d})
         self.assert_renders(
-            "{% load pinax_comments_tags %}{% comments o as cs %}",
+            "{% load pinax_comments_tags %}{% comments o %}",
             c,
             ""
         )
-        self.assertEqual(list(c["cs"]), list(Comment.objects.all()))
+        self.assertEqual(list(c["o"]), list(Comment.objects.all()))
 
     def test_ttag_comment_form(self):
         d = Demo.objects.create(name="Wizard")
         c = Context({"o": d})
         self.assert_renders(
-            "{% load pinax_comments_tags %}{% comment_form o as comment_form %}",
+            "{% load pinax_comments_tags %}{% comment_form o %}",
             c,
             ""
         )
         self.assertTrue(isinstance(c["comment_form"], CommentForm))
 
-        with self.login("gimli", "gloin"):
-            c = Context({"o": d, "user": self.user})
+        with self.login(self.gimli):
+            c = Context({"o": d, "user": self.gimli})
             self.assert_renders(
-                "{% load pinax_comments_tags %}{% comment_form o as comment_form %}",
+                "{% load pinax_comments_tags %}{% comment_form o %}",
                 c,
                 ""
             )
