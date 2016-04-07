@@ -9,7 +9,6 @@ from ..authorization import load_can_delete, load_can_edit
 from ..forms import CommentForm
 from ..models import Comment
 
-
 can_delete = load_can_delete()
 can_edit = load_can_edit()
 register = template.Library()
@@ -76,7 +75,4 @@ def comment_target(object):
 
         {% comment_target obj [as varname] %}
     """
-    return reverse("post_comment", kwargs={
-        "content_type_id": ContentType.objects.get_for_model(object).pk,
-        "object_id": object.pk
-    })
+    return reverse("pinax_comments:post_comment", args=[ContentType.objects.get_for_model(object).pk, object.pk])
