@@ -10,13 +10,13 @@ try:
 except ImportError:
     from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .authorization import load_can_delete, load_can_edit
 from .forms import CommentForm
 from .models import Comment
 from .signals import commented, comment_updated
+from .conf import settings
 
-can_delete = load_can_delete()
-can_edit = load_can_edit()
+can_delete = settings.COMMENTS_CAN_EDIT_CALLABLE
+can_edit = settings.COMMENTS_CAN_EDIT_CALLABLE
 
 
 class CommentSecureRedirectToMixin(object):
