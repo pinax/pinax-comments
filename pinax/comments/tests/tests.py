@@ -124,48 +124,51 @@ class CommentTests(TestCaseMixin):
             "2"
         )
 
-    def test_ttag_comments(self):
-        d = Demo.objects.create(name="Wizard")
-        self.post_comment(d, data={
-            "name": "Gandalf",
-            "comment": "You can't win",
-        })
-        self.post_comment(d, data={
-            "name": "Gollum",
-            "comment": "We wants our precious",
-        })
 
-        c = Context({"o": d})
-        self.assert_renders(
-            "{% load pinax_comments_tags %}{% comments o %}",
-            c,
-            ""
-        )
-        self.assertEqual(list(c["o"]), list(Comment.objects.all()))
+def test_ttag_comments(self):
+    d = Demo.objects.create(name="Wizard")
+    self.post_comment(d, data={
+        "name": "Gandalf",
+        "comment": "You can't win",
+    })
+    self.post_comment(d, data={
+        "name": "Gollum",
+        "comment": "We wants our precious",
+    })
 
-    def test_ttag_comment_form(self):
-        d = Demo.objects.create(name="Wizard")
-        c = Context({"o": d})
+    c = Context({"o": d})
+    self.assert_renders(
+        "{% load pinax_comments_tags %}{% comments o as cs %}",
+        c,
+        ""
+    )
+    self.assertEqual(list(c["cs"]), list(Comment.objects.all()))
+
+
+def test_ttag_comment_form(self):
+    d = Demo.objects.create(name="Wizard")
+    c = Context({"o": d})
+    self.assert_renders(
+        "{% load pinax_comments_tags %}{% comment_form o as comment_form %}",
+        c,
+        ""
+    )
+    self.assertTrue(isinstance(c["comment_form"], CommentForm))
+
+    with self.login(self.gimli):
+        c = Context({"o": d, "user": self.user})
         self.assert_renders(
-            "{% load pinax_comments_tags %}{% comment_form o %}",
+            "{% load pinax_comments_tags %}{% comment_form o as comment_form %}",
             c,
             ""
         )
         self.assertTrue(isinstance(c["comment_form"], CommentForm))
 
-        with self.login(self.gimli):
-            c = Context({"o": d, "user": self.gimli})
-            self.assert_renders(
-                "{% load pinax_comments_tags %}{% comment_form o %}",
-                c,
-                ""
-            )
-            self.assertTrue(isinstance(c["comment_form"], CommentForm))
 
-    def test_ttag_comment_target(self):
-        d = Demo.objects.create(name="Wizard")
-        self.assert_renders(
-            "{% load pinax_comments_tags %}{% comment_target o %}",
-            Context({"o": d}),
-            "/comment/%d/%d/" % (ContentType.objects.get_for_model(d).pk, d.pk)
-        )
+def test_ttag_comment_target(self):
+    d = Demo.objects.create(name="Wizard")
+    self.assert_renders(
+        "{% load pinax_comments_tags %}{% comment_target o %}",
+        Context({"o": d}),
+        "/comment/%d/%d/" % (ContentType.objects.get_for_model(d).pk, d.pk)
+    )
