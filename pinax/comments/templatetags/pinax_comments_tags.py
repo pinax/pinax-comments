@@ -23,6 +23,7 @@ def can_delete_comment(comment, user):
 
 
 @register.simple_tag
+@register.filter
 def comment_count(object):
     """
     Usage:
