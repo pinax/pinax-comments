@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+from __future__ import absolute_import
 
 from appconf import AppConf
 from django.conf import settings  # noqa
@@ -21,11 +21,8 @@ def load_path_attr(path):
 
 
 class CommentsAppConf(AppConf):
-    CAN_DELETE_CALLABLE = "pinax.comments.authorization.default_can_delete"
-    CAN_EDIT_CALLABLE = "pinax.comments.authorization.default_can_edit"
 
-    def configure_can_delete_callable(self, value):
-        return load_path_attr(value)
+    HOOKSET = "pinax.comments.hooks.CommentsDefaultHookSet"
 
-    def configure_can_edit_callable(self, value):
-        return load_path_attr(value)
+    def configure_hookset(self, value):
+        return load_path_attr(value)()

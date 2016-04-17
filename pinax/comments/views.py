@@ -13,10 +13,7 @@ except ImportError:
 from .forms import CommentForm
 from .models import Comment
 from .signals import commented, comment_updated
-from .conf import settings
-
-can_delete = settings.COMMENTS_CAN_EDIT_CALLABLE
-can_edit = settings.COMMENTS_CAN_EDIT_CALLABLE
+from .hooks import hookset
 
 
 class CommentSecureRedirectToMixin(object):
@@ -123,7 +120,7 @@ class CommentDeleteView(LoginRequiredMixin, CommentSecureRedirectToMixin, Delete
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         success_url = self.get_secure_redirect_to()
-        if can_delete(request.user, self.object):
+        if hookset.load_can_delete(request.user, self.object):
             self.object.delete()
             if request.is_ajax():
                 return JsonResponse({"status": "OK"})

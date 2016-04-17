@@ -21,7 +21,6 @@ class TestCaseMixin(TestCase):
                         HTTP_X_REQUESTED_WITH="XMLHttpRequest")
 
     def post_comment_2(self, url_name, *args, **kwargs):
-        # data = kwargs.get("data", {})
         url_name = "pinax_comments:" + url_name
         return self.post(url_name, args=args, kwargs=kwargs)
 
