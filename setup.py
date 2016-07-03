@@ -16,7 +16,7 @@ setup(
     description="",
     name="pinax-comments",
     long_description=read("README.rst"),
-    version="0.1",
+    version="0.1.1",
     url="http://github.com/pinax/pinax-comments/",
     license="MIT",
     install_requires=[
