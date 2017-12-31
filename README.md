@@ -5,7 +5,7 @@
 [![CircleCi](https://img.shields.io/circleci/project/github/pinax/pinax-comments.svg)](https://circleci.com/gh/pinax/pinax-comments)
 [![Codecov](https://img.shields.io/codecov/c/github/pinax/pinax-comments.svg)](https://codecov.io/gh/pinax/pinax-comments)
 [![](https://img.shields.io/github/contributors/pinax/pinax-comments.svg)](https://github.com/pinax/pinax-comments/graphs/contributors)
-[![](https://img.shields.io/github/issues-pr/pinax/pinax-comments.svg)](https://github.com/pinax/pinax-announcements/pulls)
+[![](https://img.shields.io/github/issues-pr/pinax/pinax-comments.svg)](https://github.com/pinax/pinax-comments/pulls)
 [![](https://img.shields.io/github/issues-pr-closed/pinax/pinax-comments.svg)](https://github.com/pinax/pinax-comments/pulls?q=is%3Apr+is%3Aclosed)
 
 [![](http://slack.pinaxproject.com/badge.svg)](http://slack.pinaxproject.com/)
