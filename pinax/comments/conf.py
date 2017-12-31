@@ -1,9 +1,11 @@
 from __future__ import absolute_import
 
-from appconf import AppConf
+import importlib
+
 from django.conf import settings  # noqa
 from django.core.exceptions import ImproperlyConfigured
-import importlib
+
+from appconf import AppConf
 
 
 def load_path_attr(path):

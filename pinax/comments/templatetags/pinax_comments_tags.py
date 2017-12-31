@@ -1,12 +1,11 @@
 from __future__ import unicode_literals
 
 from django import template
-from django.core.urlresolvers import reverse
-
 from django.contrib.contenttypes.models import ContentType
+from django.urls import reverse
 
-from ..hooks import hookset
 from ..forms import CommentForm
+from ..hooks import hookset
 from ..models import Comment
 
 register = template.Library()

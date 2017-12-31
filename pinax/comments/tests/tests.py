@@ -1,7 +1,6 @@
-from django.core.urlresolvers import reverse
-from django.template import Template, Context
-
 from django.contrib.contenttypes.models import ContentType
+from django.template import Context, Template
+from django.urls import reverse
 
 from pinax.comments.forms import CommentForm
 from pinax.comments.models import Comment

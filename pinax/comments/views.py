@@ -1,19 +1,20 @@
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.template import RequestContext
 from django.template.loader import render_to_string
-from django.views.generic import CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView, DeleteView, UpdateView
+
+from .forms import CommentForm
+from .hooks import hookset
+from .models import Comment
+from .signals import comment_updated, commented
+
 try:
     from account.mixins import LoginRequiredMixin
 except ImportError:
     from django.contrib.auth.mixins import LoginRequiredMixin
-
-from .forms import CommentForm
-from .models import Comment
-from .signals import commented, comment_updated
-from .hooks import hookset
 
 
 class CommentSecureRedirectToMixin(object):
