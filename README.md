@@ -1,3 +1,5 @@
+![](http://pinaxproject.com/pinax-design/patches/pinax-comments.svg)
+
 # Pinax Comments
 
 [![](https://img.shields.io/pypi/v/pinax-comments.svg)](https://pypi.python.org/pypi/pinax-comments/)
