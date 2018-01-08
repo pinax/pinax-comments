@@ -57,9 +57,8 @@ Install the development version:
 Add `pinax.comments` to your `INSTALLED_APPS` setting:
 
     INSTALLED_APPS = (
-        # ...
+        # other apps
         "pinax.comments",
-        # ...
     )
 
 Add entry to your `urls.py`:
