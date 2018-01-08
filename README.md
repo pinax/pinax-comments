@@ -64,7 +64,7 @@ Add `pinax.comments` to your `INSTALLED_APPS` setting:
 
 Add entry to your `urls.py`:
 
-    url(r"^comments/", include("pinax.comments.urls"))
+    url(r"^comments/", include("pinax.comments.urls", namespace="pinax_comments"))
     
 
 ## Change Log
