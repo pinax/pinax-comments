@@ -1,5 +1,4 @@
 from django import forms
-
 from django.contrib.contenttypes.models import ContentType
 
 from .models import Comment
@@ -18,7 +17,7 @@ class CommentForm(forms.ModelForm):
         self.obj = kwargs.pop("obj")
         self.user = kwargs.pop("user")
         super(CommentForm, self).__init__(*args, **kwargs)
-        if self.user is not None and not self.user.is_anonymous():
+        if self.user is not None and not self.user.is_anonymous:
             del self.fields["name"]
             del self.fields["email"]
             del self.fields["website"]
@@ -28,7 +27,7 @@ class CommentForm(forms.ModelForm):
         comment.ip_address = self.request.META.get("REMOTE_ADDR", None)
         comment.content_type = ContentType.objects.get_for_model(self.obj)
         comment.object_id = self.obj.pk
-        if self.user is not None and not self.user.is_anonymous():
+        if self.user is not None and not self.user.is_anonymous:
             comment.author = self.user
         if commit:
             comment.save()

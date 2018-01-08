@@ -14,9 +14,10 @@ DEFAULT_SETTINGS = dict(
         "django.contrib.sessions",
         "django.contrib.sites",
         "pinax.comments",
-        "pinax.comments.tests"
+        "pinax.comments.tests",
+        "account"
     ],
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         "django.contrib.sessions.middleware.SessionMiddleware",
         "django.contrib.auth.middleware.AuthenticationMiddleware",
     ],
