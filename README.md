@@ -74,35 +74,6 @@ Add entry to your `urls.py`:
 ### Usage
     
 
-#### Settings
-
-* `PINAX_COMMENTS_HOOKSET` - uses the hookset pattern from other Pinax apps.
-
-Used to provide your own custom comment logic methods. Override the default hookset by specifying your own:
-
-`PINAX_COMMENTS_HOOKSET = "myapp.hooks.CommentsHookSet"`
-
-Two methods are supported:
-
-  * `load_can_delete(user, comment)`
-  
-  Override this method to specify if `user` can delete `comment`. By default only comment authors can edit comments.
-  
-  * `load_can_edit(user, comment)`
-  
-  Override this method to specify if `user` can edit `comment`. By default, Django superusers and comment authors can delete comments.
-
-Here's an example hooks.py which overrides default `load_can_delete()` with a silly alternative:
-
-```python
-# myapp.hooks.py
-
-class CommentsHookSet(object):
-
-    def load_can_delete(self, user, comment):
-        return user.username == "Smith"
-```
-
 ### Template Tags
 
 #### `can_delete_comment`
@@ -182,6 +153,41 @@ Sent when a comment is added.
 #### `comment_updated`
 
 Sent when a comment is updated.
+
+
+### Hookset Methods
+
+#### `load_can_delete(self, user, comment)`
+  
+Override this method to specify if `user` can delete `comment`. By default only comment authors can edit comments.
+  
+#### `load_can_edit(self, user, comment)`
+  
+Override this method to specify if `user` can edit `comment`. By default, Django superusers and comment authors can delete comments.
+
+This example hooks.py overrides default `load_can_edit()` with a silly alternative:
+
+```python
+# myapp.hooks.py
+
+from pinax.comments.hooks import CommentsDefaultHookSet
+
+class CommentsHookSet(CommentsDefaultHookSet):
+
+    def load_can_edit(self, user, comment):
+        return user.username in ["funk", "wagnalls"]
+```
+
+
+### Settings
+
+#### PINAX_COMMENTS_HOOKSET
+
+Used to provide your own custom hookset methods, as described above. Value is a dotted path to
+your own hookset class:
+
+`PINAX_COMMENTS_HOOKSET = "myapp.hooks.CommentsHookSet"`
+
 
 ## Change Log
 
