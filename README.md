@@ -79,7 +79,8 @@ Add an `pinax.comments.urls` to your project urlpatterns:
 ### Usage
     
 Common usage involves wiring up template tags as seen in this example, which presents
-a form for adding a new comment on `wall_user`.
+a form for adding a new comment on `wall_user`, as well as showing existing comments.
+
 Three template tags are used here: `comment_target`, which returns a URL for posting
 a comment on `wall_user`; `comment_form`, which returns a comment form for
 `wall_user`; and `comments`, which returns all comments on `wall_user`.
