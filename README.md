@@ -24,6 +24,8 @@
     * [Settings](#settings)
   * [Template Tags](#templatetags)
   * [Signals](#signals)
+  * [Hookset Methods](#hookset-methods)
+  * [Settings](#settings)
 * [Change Log](#change-log)
 * [Contribute](#contribute)
 * [Code of Conduct](#code-of-conduct)
@@ -66,13 +68,50 @@ Add `pinax.comments` to your `INSTALLED_APPS` setting:
         "pinax.comments",
     )
 
-Add entry to your `urls.py`:
+Add an `pinax.comments.urls` to your project urlpatterns:
 
-    url(r"^comments/", include("pinax.comments.urls", namespace="pinax_comments"))
+    urlpatterns = [
+        # other urls
+        url(r"^comments/", include("pinax.comments.urls", namespace="pinax_comments"))
+    ]
 
 
 ### Usage
     
+Common usage involves wiring up template tags as seen in this example, which presents
+a form for adding a new comment on `wall_user`.
+Three template tags are used here: `comment_target`, which returns a URL for posting
+a comment on `wall_user`; `comment_form`, which returns a comment form for
+`wall_user`; and `comments`, which returns all comments on `wall_user`.
+
+```djangotemplate
+    <div class="list-group">
+        <div class="list-group-item">
+            {% comment_target wall_user as post_url %}
+            {% comment_form wall_user as comment_form %}
+            <form class="form" method="post" action="{{ post_url }}">
+                {% csrf_token %}
+                {{ comment_form|bootstrap }}
+                <button class="btn btn-primary">Post Message</button>
+            </form>
+        </div>
+        
+        {% comments wall_user as wall_comments %}
+        {% for comment in wall_comments %}
+        <div class="list-group-item">
+            {{ comment.comment|linebreaks }}
+            <div class="meta">
+                <small class="text-muted pull-right">{{ comment.submit_date }}</small>
+                <small class="text-muted">
+                    <a href="{% url "wall" comment.author.username %}">
+                        {{ comment.author }}
+                    </a>
+                </small>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+```
 
 ### Template Tags
 
