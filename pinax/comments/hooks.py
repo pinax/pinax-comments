@@ -1,4 +1,5 @@
 class CommentsDefaultHookSet(object):
+
     def load_can_delete(self, user, comment):
         if user.is_superuser:
             return True

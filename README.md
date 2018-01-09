@@ -20,6 +20,10 @@
   * [Supported Django and Python versions](#supported-django-and-python-versions)
 * [Documentation](#documentation)
   * [Installation](#installation)
+  * [Usage](#usage)
+    * [Settings](#settings)
+  * [Template Tags](#templatetags)
+  * [Signals](#signals)
 * [Change Log](#change-log)
 * [Contribute](#contribute)
 * [Code of Conduct](#code-of-conduct)
@@ -48,6 +52,7 @@ Django \ Python | 2.7 | 3.4 | 3.5 | 3.6
 
 ## Documentation
 
+
 ### Installation
 
 Install the development version:
@@ -64,7 +69,119 @@ Add `pinax.comments` to your `INSTALLED_APPS` setting:
 Add entry to your `urls.py`:
 
     url(r"^comments/", include("pinax.comments.urls", namespace="pinax_comments"))
+
+
+### Usage
     
+
+#### Settings
+
+* `PINAX_COMMENTS_HOOKSET` - uses the hookset pattern from other Pinax apps.
+
+Used to provide your own custom comment logic methods. Override the default hookset by specifying your own:
+
+`PINAX_COMMENTS_HOOKSET = "myapp.hooks.CommentsHookSet"`
+
+Two methods are supported:
+
+  * `load_can_delete(user, comment)`
+  
+  Override this method to specify if `user` can delete `comment`. By default only comment authors can edit comments.
+  
+  * `load_can_edit(user, comment)`
+  
+  Override this method to specify if `user` can edit `comment`. By default, Django superusers and comment authors can delete comments.
+
+Here's an example hooks.py which overrides default `load_can_delete()` with a silly alternative:
+
+```python
+# myapp.hooks.py
+
+class CommentsHookSet(object):
+
+    def load_can_delete(self, user, comment):
+        return user.username == "Smith"
+```
+
+### Template Tags
+
+#### `can_delete_comment`
+
+Returns True if `user` can delete `comment`.
+
+```djangotemplate
+    {% if comment|can_delete_comment:user %}
+```
+
+#### `can_edit_comment`
+
+Returns True if `user` can edit `comment`.
+
+```djangotemplate
+    {% if comment|can_edit_comment:user %}
+```
+
+#### `comment_count`
+
+Returns number of comments on `obj`.
+
+Usage:
+
+```djangotemplate
+    {% comment_count obj %}
+```
+
+or
+
+```djangotemplate
+    {% comment_count obj as var %}
+```
+
+#### `comment_form`
+
+Returns a comment form for `obj`. Checks context user to determine
+if the comment should be from an authenticated or anonymous user. 
+
+Usage:
+
+```djangotemplate
+    {% comment_form obj as comment_form %}
+```
+
+#### `comment_target`
+
+Returns the URL for posting a comment on `obj`
+
+```djangotemplate
+    {% comment_target obj %}
+```
+
+or
+
+```djangotemplate
+    {% comment_target obj as var %}
+```
+
+#### `comments`
+
+Returns iterable of comments on `obj` as context variable `var`.
+
+```djangotemplate
+    {% comments obj as var %}
+```
+
+
+### Signals
+
+Both signals provide two keyword arguments: `comment`, the relevant `Comment` instance, and `request`.
+
+#### `commented`
+
+Sent when a comment is added. 
+
+#### `comment_updated`
+
+Sent when a comment is updated.
 
 ## Change Log
 
