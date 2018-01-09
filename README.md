@@ -192,6 +192,7 @@ Sent when a comment is updated.
 * Move documentation into README, standardize documentation layout
 * Convert CI and coverage to CircleCi and CodeCov
 * Add PyPi-compatible long description
+* Add documentation for templatetags and signals
 
 ### 0.1
 
