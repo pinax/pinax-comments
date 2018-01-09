@@ -238,6 +238,7 @@ your own hookset class:
 * Convert CI and coverage to CircleCi and CodeCov
 * Add PyPi-compatible long description
 * Add documentation for templatetags and signals
+* Add usage example
 
 ### 0.1
 
