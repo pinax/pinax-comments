@@ -61,21 +61,27 @@ Django \ Python | 2.7 | 3.4 | 3.5 | 3.6
 
 Install the development version:
 
-    pip install pinax-comments
+```shell
+    $ pip install pinax-comments
+```
 
 Add `pinax.comments` to your `INSTALLED_APPS` setting:
 
+```python
     INSTALLED_APPS = (
         # other apps
         "pinax.comments",
     )
+```
 
 Add an `pinax.comments.urls` to your project urlpatterns:
 
+```python
     urlpatterns = [
         # other urls
         url(r"^comments/", include("pinax.comments.urls", namespace="pinax_comments"))
     ]
+```
 
 ### Usage
     
@@ -86,7 +92,7 @@ Three template tags are used here: `comment_target`, which returns a URL for pos
 a comment on `wall_user`; `comment_form`, which returns a comment form for
 `wall_user`; and `comments`, which returns all comments on `wall_user`.
 
-```djangotemplate
+```django
     <div class="list-group">
         <div class="list-group-item">
             {% comment_target wall_user as post_url %}
@@ -121,7 +127,7 @@ a comment on `wall_user`; `comment_form`, which returns a comment form for
 
 Returns True if `user` can delete `comment`.
 
-```djangotemplate
+```django
     {% if comment|can_delete_comment:user %}
 ```
 
@@ -129,7 +135,7 @@ Returns True if `user` can delete `comment`.
 
 Returns True if `user` can edit `comment`.
 
-```djangotemplate
+```django
     {% if comment|can_edit_comment:user %}
 ```
 
@@ -139,13 +145,13 @@ Returns number of comments on `obj`.
 
 Usage:
 
-```djangotemplate
+```django
     {% comment_count obj %}
 ```
 
 or
 
-```djangotemplate
+```django
     {% comment_count obj as var %}
 ```
 
@@ -156,7 +162,7 @@ if the comment should be from an authenticated or anonymous user.
 
 Usage:
 
-```djangotemplate
+```django
     {% comment_form obj as comment_form %}
 ```
 
@@ -164,13 +170,13 @@ Usage:
 
 Returns the URL for posting a comment on `obj`
 
-```djangotemplate
+```django
     {% comment_target obj %}
 ```
 
 or
 
-```djangotemplate
+```django
     {% comment_target obj as var %}
 ```
 
@@ -178,7 +184,7 @@ or
 
 Returns iterable of comments on `obj` as context variable `var`.
 
-```djangotemplate
+```django
     {% comments obj as var %}
 ```
 
@@ -224,8 +230,9 @@ class CommentsHookSet(CommentsDefaultHookSet):
 Used to provide your own custom hookset methods, as described above. Value is a dotted path to
 your own hookset class:
 
+```django
 `PINAX_COMMENTS_HOOKSET = "myapp.hooks.CommentsHookSet"`
-
+```
 
 ## Change Log
 
