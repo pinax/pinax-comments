@@ -24,7 +24,7 @@
   * [Installation](#installation)
   * [Usage](#usage)
     * [Settings](#settings)
-  * [Template Tags](#templatetags)
+  * [Template Tags](#template-tags)
   * [Signals](#signals)
   * [Hookset Methods](#hookset-methods)
   * [Settings](#settings)
