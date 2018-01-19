@@ -14,6 +14,7 @@
 [![](http://slack.pinaxproject.com/badge.svg)](http://slack.pinaxproject.com/)
 [![](https://img.shields.io/badge/license-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
+
 ## Table of Contents
 
 * [About Pinax](#about-pinax)
@@ -39,6 +40,7 @@
 Pinax is an open-source platform built on the Django Web Framework. It is an ecosystem of reusable
 Django apps, themes, and starter project templates. This collection can be found at http://pinaxproject.com.
 
+
 ## pinax-comments
 
 ### Overview
@@ -54,7 +56,6 @@ Django \ Python | 2.7 | 3.4 | 3.5 | 3.6
 
 
 ## Documentation
-
 
 ### Installation
 
@@ -75,7 +76,6 @@ Add an `pinax.comments.urls` to your project urlpatterns:
         # other urls
         url(r"^comments/", include("pinax.comments.urls", namespace="pinax_comments"))
     ]
-
 
 ### Usage
     
@@ -182,7 +182,6 @@ Returns iterable of comments on `obj` as context variable `var`.
     {% comments obj as var %}
 ```
 
-
 ### Signals
 
 Both signals provide two keyword arguments: `comment`, the relevant `Comment` instance, and `request`.
@@ -194,7 +193,6 @@ Sent when a comment is added.
 #### `comment_updated`
 
 Sent when a comment is updated.
-
 
 ### Hookset Methods
 
@@ -218,7 +216,6 @@ class CommentsHookSet(CommentsDefaultHookSet):
     def load_can_edit(self, user, comment):
         return user.username in ["funk", "wagnalls"]
 ```
-
 
 ### Settings
 
