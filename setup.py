@@ -30,7 +30,7 @@ Pinax Comments
 .. image:: http://slack.pinaxproject.com/badge.svg
     :target: http://slack.pinaxproject.com/
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
-    :target: https://pypi.python.org/pypi/pinax-comments/
+    :target: https://opensource.org/licenses/MIT/
 
 \ 
 
