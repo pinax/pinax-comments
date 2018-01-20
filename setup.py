@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 LONG_DESCRIPTION = """
 .. image:: http://pinaxproject.com/pinax-design/patches/pinax-comments.svg
     :target: https://pypi.python.org/pypi/pinax-comments/
@@ -57,19 +57,10 @@ setup(
     version=VERSION,
     url="http://github.com/pinax/pinax-comments/",
     license="MIT",
-    install_requires=[
-        "django-appconf>=1.0.1",
-    ],
     packages=find_packages(),
     package_data={
         "comments": []
     },
-    test_suite="runtests.runtests",
-    tests_require=[
-        "django-test-plus>=1.0.11",
-        "django-appconf>=1.0.1",
-        "django-user-accounts>=1.3.1",
-    ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
@@ -88,5 +79,15 @@ setup(
         'Programming Language :: Python :: 3.6',
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
+    install_requires=[
+        "django>=1.11",
+        "django-appconf>=1.0.1",
+    ],
+    tests_require=[
+        "django-test-plus>=1.0.22",
+        "django-appconf>=1.0.1",
+        "django-user-accounts>=2.0.3",
+    ],
+    test_suite="runtests.runtests",
     zip_safe=False
 )

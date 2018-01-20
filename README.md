@@ -68,13 +68,13 @@ Install the development version:
 Add `pinax.comments` to your `INSTALLED_APPS` setting:
 
 ```python
-    INSTALLED_APPS = (
+    INSTALLED_APPS = [
         # other apps
         "pinax.comments",
-    )
+    ]
 ```
 
-Add an `pinax.comments.urls` to your project urlpatterns:
+Add `pinax.comments.urls` to your project urlpatterns:
 
 ```python
     urlpatterns = [
@@ -230,11 +230,18 @@ class CommentsHookSet(CommentsDefaultHookSet):
 Used to provide your own custom hookset methods, as described above. Value is a dotted path to
 your own hookset class:
 
-```django
+```python
 PINAX_COMMENTS_HOOKSET = "myapp.hooks.CommentsHookSet"
 ```
 
 ## Change Log
+
+### 1.0.1
+
+* add django>=1.11 requirement
+* update testing requirements
+* improve documentation markup
+* remove "static" and "templates" dirs from MANIFEST.in
 
 ### 1.0.0
 
