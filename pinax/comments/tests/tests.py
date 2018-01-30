@@ -136,29 +136,7 @@ class CommentTests(TestCaseMixin):
         """Ensure existing comment is updated"""
         d = Demo.objects.create(name="Wizard")
         with self.login(self.gimli):
-            response = self.post_comment(d, data={
-                "comment": "Wow, you're a jerk.",
-            })
-            comment = Comment.objects.get()
-
-            new_comment = "Oops, wrong wizard! You are wonderful!"
-            post_data = dict(comment=new_comment)
-            response = self.post(
-                "pinax_comments:edit_comment",
-                pk=comment.pk,
-                data=post_data,
-                extra=dict(HTTP_X_REQUESTED_WITH="XMLHttpRequest")
-            )
-            self.assertEqual(response.status_code, 200)
-            comment.refresh_from_db()
-            self.assertEqual(comment.comment, new_comment)
-
-    def test_ajax_update_comment_bad_data(self):
-        """Ensure existing comment is updated"""
-        d = Demo.objects.create(name="Wizard")
-        with self.login(self.gimli):
-            response = self.post_comment(d, data={
-                "artist": "Frida Kahlo",
+            self.post_comment(d, data={
                 "comment": "Wow, you're a jerk.",
             })
             comment = Comment.objects.get()
