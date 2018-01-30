@@ -105,7 +105,7 @@ class CommentTests(TestCaseMixin):
         d = Demo.objects.create(name="Wizard")
 
         response = self.post_comment(d, data={
-            "thatguy": "Frodo Baggins",
+            "artist": "Frida Kahlo",
             "comment": "Where'd you go?",
         }, extra=dict(HTTP_X_REQUESTED_WITH="XMLHttpRequest"))
         self.response_200(response)
@@ -129,6 +129,49 @@ class CommentTests(TestCaseMixin):
                 data=post_data,
             )
             self.assertEqual(response.status_code, 302)
+            comment.refresh_from_db()
+            self.assertEqual(comment.comment, new_comment)
+
+    def test_ajax_update_comment(self):
+        """Ensure existing comment is updated"""
+        d = Demo.objects.create(name="Wizard")
+        with self.login(self.gimli):
+            response = self.post_comment(d, data={
+                "comment": "Wow, you're a jerk.",
+            })
+            comment = Comment.objects.get()
+
+            new_comment = "Oops, wrong wizard! You are wonderful!"
+            post_data = dict(comment=new_comment)
+            response = self.post(
+                "pinax_comments:edit_comment",
+                pk=comment.pk,
+                data=post_data,
+                extra=dict(HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+            )
+            self.assertEqual(response.status_code, 200)
+            comment.refresh_from_db()
+            self.assertEqual(comment.comment, new_comment)
+
+    def test_ajax_update_comment_bad_data(self):
+        """Ensure existing comment is updated"""
+        d = Demo.objects.create(name="Wizard")
+        with self.login(self.gimli):
+            response = self.post_comment(d, data={
+                "artist": "Frida Kahlo",
+                "comment": "Wow, you're a jerk.",
+            })
+            comment = Comment.objects.get()
+
+            new_comment = "Oops, wrong wizard! You are wonderful!"
+            post_data = dict(comment=new_comment)
+            response = self.post(
+                "pinax_comments:edit_comment",
+                pk=comment.pk,
+                data=post_data,
+                extra=dict(HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+            )
+            self.assertEqual(response.status_code, 200)
             comment.refresh_from_db()
             self.assertEqual(comment.comment, new_comment)
 
@@ -156,6 +199,41 @@ class CommentTests(TestCaseMixin):
             response = self.post("pinax_comments:delete_comment", pk=comment.pk)
             self.assertEqual(response.status_code, 302)
             self.assertEqual(Comment.objects.count(), 0)
+
+    def test_ajax_delete_comment(self):
+        d = Demo.objects.create(name="Wizard")
+        with self.login(self.gimli):
+            response = self.post_comment(d, data={
+                "comment": "Wow, you're a jerk.",
+            })
+            comment = Comment.objects.get()
+
+            response = self.post(
+                "pinax_comments:delete_comment",
+                pk=comment.pk,
+                extra=dict(HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+            )
+            self.assertEqual(response.status_code, 200)
+            # Verify comment is deleted
+            self.assertEqual(Comment.objects.count(), 0)
+
+    def test_ajax_delete_comment_wrong_user(self):
+        d = Demo.objects.create(name="Wizard")
+        with self.login(self.gimli):
+            response = self.post_comment(d, data={
+                "comment": "Wow, you're a jerk.",
+            })
+            comment = Comment.objects.get()
+
+        with self.login(self.aragorn):
+            response = self.post(
+                "pinax_comments:delete_comment",
+                pk=comment.pk,
+                extra=dict(HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+            )
+            self.assertEqual(response.status_code, 200)
+            # Verify comment is not deleted
+            self.assertEqual(Comment.objects.count(), 1)
 
     def test_ttag_comment_count(self):
         d = Demo.objects.create(name="Wizard")
