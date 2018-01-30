@@ -39,4 +39,4 @@ class Comment(models.Model):
         }
 
     def __str__(self):
-        return "pk=%d" % self.pk
+        return "pk=%d" % self.pk  # pragma: no cover

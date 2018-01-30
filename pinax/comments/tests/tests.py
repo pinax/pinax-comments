@@ -275,3 +275,45 @@ class CommentTests(TestCaseMixin):
             Context({"o": d}),
             "/comment/%d/%d/" % (ContentType.objects.get_for_model(d).pk, d.pk)
         )
+
+    def test_ttag_can_edit_comment(self):
+        d = Demo.objects.create(name="Wizard")
+        with self.login(self.gimli):
+            self.post_comment(d, data={
+                "name": "Gandalf",
+                "comment": "You can't win",
+            })
+            comment = Comment.objects.get()
+
+        self.assert_renders(
+            "{% load pinax_comments_tags %}{% if comment|can_edit_comment:user %}True{% else %}False{% endif %}",
+            Context({"comment": comment, "user": self.gimli}),
+            "True"
+        )
+
+        self.assert_renders(
+            "{% load pinax_comments_tags %}{% if comment|can_edit_comment:user %}True{% else %}False{% endif %}",
+            Context({"comment": comment, "user": self.aragorn}),
+            "False"
+        )
+
+    def test_ttag_can_delete_comment(self):
+        d = Demo.objects.create(name="Wizard")
+        with self.login(self.gimli):
+            self.post_comment(d, data={
+                "name": "Gandalf",
+                "comment": "You can't win",
+            })
+            comment = Comment.objects.get()
+
+        self.assert_renders(
+            "{% load pinax_comments_tags %}{% if comment|can_delete_comment:user %}True{% else %}False{% endif %}",
+            Context({"comment": comment, "user": self.gimli}),
+            "True"
+        )
+
+        self.assert_renders(
+            "{% load pinax_comments_tags %}{% if comment|can_delete_comment:user %}True{% else %}False{% endif %}",
+            Context({"comment": comment, "user": self.aragorn}),
+            "False"
+        )
