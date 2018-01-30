@@ -236,6 +236,12 @@ PINAX_COMMENTS_HOOKSET = "myapp.hooks.CommentsHookSet"
 
 ## Change Log
 
+### 1.0.2
+
+* Replace deprecated render_to_string() `context_instance` kwarg
+* Add view tests
+* Add templatetag tests
+
 ### 1.0.1
 
 * add django>=1.11 requirement
