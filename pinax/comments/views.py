@@ -62,7 +62,7 @@ class CommentCreateView(CommentSecureRedirectToMixin, CreateView):
                 "comment": self.object.data,
                 "html": render_to_string("pinax/comments/_comment.html", {
                     "comment": self.object
-                }, context_instance=RequestContext(self.request))
+                }, request=self.request)
             }
             return JsonResponse(data)
         return HttpResponseRedirect(self.get_secure_redirect_to(self.content_object))
@@ -75,7 +75,7 @@ class CommentCreateView(CommentSecureRedirectToMixin, CreateView):
                 "html": render_to_string("pinax/comments/_form.html", {
                     "form": form,
                     "obj": self.content_object
-                }, context_instance=RequestContext(self.request))
+                }, request=self.request)
             }
             return JsonResponse(data)
         return HttpResponseRedirect(self.get_secure_redirect_to(self.content_object))

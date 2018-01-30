@@ -23,7 +23,7 @@ class TestCaseMixin(TestCase):
         url_name = "pinax_comments:" + url_name
         return self.post(url_name, args=args, kwargs=kwargs)
 
-    def postajax(self, url_name, *args, **kwargs):
+    def post_ajax(self, url_name, *args, **kwargs):
         data = kwargs.pop("data", {})
         return self.post(reverse(url_name, args=args, kwargs=kwargs), data,
                          HTTP_X_REQUESTED_WITH="XMLHttpRequest")
@@ -46,12 +46,13 @@ class CommentTests(TestCaseMixin):
         tmpl = Template(tmpl)
         self.assertEqual(tmpl.render(context), value)
 
-    def post_comment(self, obj, data):
+    def post_comment(self, obj, data, **kwargs):
         return self.post(
             "pinax_comments:post_comment",
             content_type_id=ContentType.objects.get_for_model(obj).pk,
             object_id=obj.pk,
-            data=data
+            data=data,
+            **kwargs
         )
 
     def test_post_comment(self):
@@ -84,6 +85,53 @@ class CommentTests(TestCaseMixin):
             self.assertEqual(c.comment, "I thought you were watching the hobbits?")
             self.assertEqual(c.author, self.gimli)
 
+    def test_ajax_post_comment(self):
+        """Verify comment created via AJAX"""
+        d = Demo.objects.create(name="Wizard")
+
+        response = self.post_comment(d, data={
+            "name": "Frodo Baggins",
+            "comment": "Where'd you go?",
+        }, extra=dict(HTTP_X_REQUESTED_WITH="XMLHttpRequest"))
+        self.response_200(response)
+
+        self.assertEqual(Comment.objects.count(), 1)
+        c = Comment.objects.get()
+        self.assertEqual(c.author, None)
+        self.assertEqual(c.name, "Frodo Baggins")
+
+    def test_ajax_post_comment_bad_data(self):
+        """Verify no comment created if form data is invalid"""
+        d = Demo.objects.create(name="Wizard")
+
+        response = self.post_comment(d, data={
+            "thatguy": "Frodo Baggins",
+            "comment": "Where'd you go?",
+        }, extra=dict(HTTP_X_REQUESTED_WITH="XMLHttpRequest"))
+        self.response_200(response)
+        # Ensure no comment was created
+        self.assertEqual(Comment.objects.count(), 0)
+
+    def test_update_comment(self):
+        """Ensure existing comment is updated"""
+        d = Demo.objects.create(name="Wizard")
+        with self.login(self.gimli):
+            response = self.post_comment(d, data={
+                "comment": "Wow, you're a jerk.",
+            })
+            comment = Comment.objects.get()
+
+            new_comment = "Oops, wrong wizard! You are wonderful!"
+            post_data = dict(comment=new_comment)
+            response = self.post(
+                "pinax_comments:edit_comment",
+                pk=comment.pk,
+                data=post_data,
+            )
+            self.assertEqual(response.status_code, 302)
+            comment.refresh_from_db()
+            self.assertEqual(comment.comment, new_comment)
+
     def test_delete_comment(self):
         d = Demo.objects.create(name="Wizard")
         with self.login(self.gimli):
@@ -91,15 +139,19 @@ class CommentTests(TestCaseMixin):
                 "comment": "Wow, you're a jerk.",
             })
             comment = Comment.objects.get()
+
+        # Anonymous user cannot delete
         response = self.post("pinax_comments:delete_comment", pk=comment.pk)
         self.response_404(response)
         self.assertEqual(Comment.objects.count(), 1)
 
+        # User is not comment author, cannot delete
         with self.login(self.aragorn):
             response = self.post("pinax_comments:delete_comment", pk=comment.pk)
             self.assertEqual(response.status_code, 302)
             self.assertEqual(Comment.objects.count(), 1)
 
+        # Comment author can delete
         with self.login(self.gimli):
             response = self.post("pinax_comments:delete_comment", pk=comment.pk)
             self.assertEqual(response.status_code, 302)
@@ -122,39 +174,28 @@ class CommentTests(TestCaseMixin):
             "2"
         )
 
+    def test_ttag_comments(self):
+        d = Demo.objects.create(name="Wizard")
+        self.post_comment(d, data={
+            "name": "Gandalf",
+            "comment": "You can't win",
+        })
+        self.post_comment(d, data={
+            "name": "Gollum",
+            "comment": "We wants our precious",
+        })
 
-def test_ttag_comments(self):
-    d = Demo.objects.create(name="Wizard")
-    self.post_comment(d, data={
-        "name": "Gandalf",
-        "comment": "You can't win",
-    })
-    self.post_comment(d, data={
-        "name": "Gollum",
-        "comment": "We wants our precious",
-    })
+        c = Context({"o": d})
+        self.assert_renders(
+            "{% load pinax_comments_tags %}{% comments o as cs %}",
+            c,
+            ""
+        )
+        self.assertEqual(list(c["cs"]), list(Comment.objects.all()))
 
-    c = Context({"o": d})
-    self.assert_renders(
-        "{% load pinax_comments_tags %}{% comments o as cs %}",
-        c,
-        ""
-    )
-    self.assertEqual(list(c["cs"]), list(Comment.objects.all()))
-
-
-def test_ttag_comment_form(self):
-    d = Demo.objects.create(name="Wizard")
-    c = Context({"o": d})
-    self.assert_renders(
-        "{% load pinax_comments_tags %}{% comment_form o as comment_form %}",
-        c,
-        ""
-    )
-    self.assertTrue(isinstance(c["comment_form"], CommentForm))
-
-    with self.login(self.gimli):
-        c = Context({"o": d, "user": self.user})
+    def test_ttag_comment_form(self):
+        d = Demo.objects.create(name="Wizard")
+        c = Context({"o": d})
         self.assert_renders(
             "{% load pinax_comments_tags %}{% comment_form o as comment_form %}",
             c,
@@ -162,11 +203,19 @@ def test_ttag_comment_form(self):
         )
         self.assertTrue(isinstance(c["comment_form"], CommentForm))
 
+        with self.login(self.gimli):
+            c = Context({"o": d, "user": self.gimli})
+            self.assert_renders(
+                "{% load pinax_comments_tags %}{% comment_form o as comment_form %}",
+                c,
+                ""
+            )
+            self.assertTrue(isinstance(c["comment_form"], CommentForm))
 
-def test_ttag_comment_target(self):
-    d = Demo.objects.create(name="Wizard")
-    self.assert_renders(
-        "{% load pinax_comments_tags %}{% comment_target o %}",
-        Context({"o": d}),
-        "/comment/%d/%d/" % (ContentType.objects.get_for_model(d).pk, d.pk)
-    )
+    def test_ttag_comment_target(self):
+        d = Demo.objects.create(name="Wizard")
+        self.assert_renders(
+            "{% load pinax_comments_tags %}{% comment_target o %}",
+            Context({"o": d}),
+            "/comment/%d/%d/" % (ContentType.objects.get_for_model(d).pk, d.pk)
+        )
