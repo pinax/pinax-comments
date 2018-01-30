@@ -68,7 +68,7 @@ def comment_target(object):
     Usage:
         {% comment_target obj [as varname] %}
     """
-    return reverse("post_comment", kwargs={
+    return reverse("pinax_comments:post_comment", kwargs={
         "content_type_id": ContentType.objects.get_for_model(object).pk,
         "object_id": object.pk
     })

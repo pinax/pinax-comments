@@ -26,11 +26,12 @@ class Comment(models.Model):
     ip_address = models.GenericIPAddressField(null=True)
     public = models.BooleanField(default=True)
 
+    @property
     def data(self):
         return {
             "pk": self.pk,
             "comment": self.comment,
-            "author": self.author.username,
+            "author": self.author.username if self.author else "",
             "name": self.name,
             "email": self.email,
             "website": self.website,
@@ -38,4 +39,4 @@ class Comment(models.Model):
         }
 
     def __str__(self):
-        return "pk=%d" % self.pk
+        return "pk=%d" % self.pk  # pragma: no cover
