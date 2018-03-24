@@ -85,8 +85,6 @@ setup(
     ],
     tests_require=[
         "django-test-plus>=1.0.22",
-        "django-appconf>=1.0.1",
-        "django-user-accounts>=2.0.3",
     ],
     test_suite="runtests.runtests",
     zip_safe=False

@@ -163,7 +163,7 @@ class CommentTests(TestCaseMixin):
 
         # Anonymous user cannot delete
         response = self.post("pinax_comments:delete_comment", pk=comment.pk)
-        self.response_404(response)
+        self.response_302(response)
         self.assertEqual(Comment.objects.count(), 1)
 
         # User is not comment author, cannot delete
