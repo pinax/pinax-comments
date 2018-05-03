@@ -236,6 +236,10 @@ PINAX_COMMENTS_HOOKSET = "myapp.hooks.CommentsHookSet"
 
 ## Change Log
 
+### 1.0.3
+
+* Remove django-user-accounts from test requirements
+
 ### 1.0.2
 
 * Replace deprecated render_to_string() `context_instance` kwarg
