@@ -23,7 +23,6 @@
 * [Documentation](#documentation)
   * [Installation](#installation)
   * [Usage](#usage)
-    * [Settings](#settings)
   * [Template Tags](#template-tags)
   * [Signals](#signals)
   * [Hookset Methods](#hookset-methods)
