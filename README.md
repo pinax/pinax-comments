@@ -58,7 +58,7 @@ Where you can find what you need:
 
 `pinax-comments` is a comments app for Django.
 
-#### Supported Django and Python versions
+#### Supported Django and Python Versions
 
 Django / Python | 3.6 | 3.7 | 3.8
 --------------- | --- | --- | ---
@@ -303,4 +303,4 @@ For updates and news regarding the Pinax Project, please follow us on Twitter [@
 
 ## License
 
-Copyright (c) 2012-2019 James Tauber and contributors under the [MIT license](https://opensource.org/licenses/MIT).
+Copyright (c) 2012-present James Tauber and contributors under the [MIT license](https://opensource.org/licenses/MIT).
