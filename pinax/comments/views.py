@@ -16,7 +16,7 @@ except ImportError:
     from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-class CommentSecureRedirectToMixin(object):
+class CommentSecureRedirectToMixin:
 
     def get_secure_redirect_to(self, object=None):
         redirect_to = self.request.POST.get("next")
@@ -39,7 +39,7 @@ class CommentCreateView(CommentSecureRedirectToMixin, CreateView):
     content_object = None
 
     def get_form_kwargs(self):
-        kwargs = super(CommentCreateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({
             "request": self.request,
             "obj": self.content_object,
@@ -50,7 +50,7 @@ class CommentCreateView(CommentSecureRedirectToMixin, CreateView):
     def post(self, request, *args, **kwargs):
         content_type = get_object_or_404(ContentType, pk=self.kwargs.get("content_type_id"))
         self.content_object = content_type.get_object_for_this_type(pk=self.kwargs.get("object_id"))
-        return super(CommentCreateView, self).post(request, *args, **kwargs)
+        return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
         self.object = form.save()
@@ -85,7 +85,7 @@ class CommentUpdateView(LoginRequiredMixin, CommentSecureRedirectToMixin, Update
     form_class = CommentForm
 
     def get_form_kwargs(self):
-        kwargs = super(CommentUpdateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs.update({
             "request": self.request,
             "obj": self.object.content_object,

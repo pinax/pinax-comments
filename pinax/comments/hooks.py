@@ -1,4 +1,4 @@
-class CommentsDefaultHookSet(object):
+class CommentsDefaultHookSet:
 
     def load_can_delete(self, user, comment):
         if user.is_superuser:
@@ -9,7 +9,7 @@ class CommentsDefaultHookSet(object):
         return user == comment.author
 
 
-class HookProxy(object):
+class HookProxy:
     def __getattr__(self, attr):
         from .conf import settings
         return getattr(settings.COMMENTS_HOOKSET, attr)

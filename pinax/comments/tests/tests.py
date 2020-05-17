@@ -38,7 +38,7 @@ class TestCaseMixin(TestCase):
 
 class CommentTests(TestCaseMixin):
     def setUp(self):
-        super(CommentTests, self).setUp()
+        super().setUp()
         self.gimli = self.make_user(username="gimli")
         self.aragorn = self.make_user(username="aragorn")
 
