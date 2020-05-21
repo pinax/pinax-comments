@@ -1,7 +1,7 @@
 from setuptools import find_packages, setup
 
 VERSION = "2.0.0"
-LONG_DESCRIPTION = r"""
+LONG_DESCRIPTION = """
 .. image:: http://pinaxproject.com/pinax-design/patches/pinax-comments.svg
     :target: https://pypi.python.org/pypi/pinax-comments/
 
