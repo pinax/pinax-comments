@@ -21,7 +21,7 @@ openapi_routes = path(
         version="0.0.1",
         patterns=comments_urlpatterns,
     ),
-    name="openapi-schema",
+    name="openapi-schema-pinax_comments",
 )
 
 urlpatterns = comments_urlpatterns + [openapi_routes]
