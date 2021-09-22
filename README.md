@@ -104,13 +104,15 @@ a comment on `wall_user`; `comment_form`, which returns a comment form for
 `wall_user`; and `comments`, which returns all comments on `wall_user`.
 
 ```django
+    {% load pinax_comments_tags %}
+
     <div class="list-group">
         <div class="list-group-item">
             {% comment_target wall_user as post_url %}
             {% comment_form wall_user as comment_form %}
             <form class="form" method="post" action="{{ post_url }}">
                 {% csrf_token %}
-                {{ comment_form|bootstrap }}
+                {{ comment_form }}
                 <button class="btn btn-primary">Post Message</button>
             </form>
         </div>
