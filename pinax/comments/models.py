@@ -8,7 +8,7 @@ from django.db import models
 
 class Comment(models.Model):
 
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="comments", on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, related_name="pinax_comments", on_delete=models.CASCADE)
 
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=255, blank=True)
